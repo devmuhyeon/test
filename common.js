@@ -2074,7 +2074,8 @@ function swiperActiveIndex(swiper) {
         while (document.getElementById(id) || document.getElementById(id + '-heading')) id += '-1';
         state.$layer = $('<div class="w24dp-layer">').appendTo('body');
         state.$dialog = $('<div class="w24dp-dialog" role="dialog" aria-modal="true">')
-            .attr({ id: id, lang: state.lang, 'aria-label': state.label }).appendTo(state.$layer);
+            .attr({ id: id, lang: state.lang, 'aria-label': state.label })
+            .toggleClass('w24dp-month-dialog', state.monthOnly).appendTo(state.$layer);
         var $main = $('<div class="w24dp-main">').appendTo(state.$dialog);
         var $header = $('<div class="w24dp-header">').appendTo($main);
         var unit = state.monthOnly ? words.year : words.monthField;
@@ -2117,7 +2118,7 @@ function swiperActiveIndex(swiper) {
             state.$count = $('<strong>').appendTo($summary);
             state.$list = $('<ul class="w24dp-list">').attr('aria-label', words.count).appendTo($side);
             var $actions = $('<div class="w24dp-footer">').appendTo($side);
-            state.$reset = button(words.reset, 'reset').appendTo($actions);
+            state.$reset = button(words.reset, 'reset').prepend($('<span aria-hidden="true">').text('⟲ ')).appendTo($actions);
             button(words.apply, 'apply').appendTo($actions);
         }
 

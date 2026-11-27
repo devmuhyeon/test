@@ -7,27 +7,46 @@
     <link rel="stylesheet" href="common.css">
     <link rel="stylesheet" href="layout.css">
     <link rel="stylesheet" href="jquery-ui.css">
+    <style>
+        .datepicker-demo { max-width: 720px; margin: 48px auto; padding: 0 16px; }
+        .datepicker-demo-list { display: flex; flex-direction: column; gap: 28px; margin-top: 24px; }
+        .datepicker-demo-item { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+        .datepicker-demo-item h2 { margin: 0; font-size: 16px; line-height: 1.5; }
+        .datepicker-demo-item input[readonly] { width: 80px; padding: 4px 8px; }
+    </style>
     <script src="jquery-3.6.1.min.js" defer></script>
     <script src="common.js" defer></script>
 </head>
 <body>
-    <main style="max-width:720px;margin:48px auto;padding:0 16px">
+    <main class="datepicker-demo">
         <h1>PC 공통 데이트피커</h1>
-        <form>
-            <p>단일 날짜 선택</p>
-            <button type="button" class="date_picker_btn" w24-datepicker="single" data-dp-name="visitDate"></button>
-            <p>다중 날짜 선택 · 선택 월 고정</p>
-            <button type="button" class="date_picker_btn" w24-datepicker="multiple" data-dp-name="limitedDates" data-dp-locked-month="2026-12" data-dp-value="2026-12-05,2026-12-08,2026-12-09,2026-12-12"><span class="blind">지정 월 내 날짜 선택</span></button>
-            <p>다중 날짜 선택 · 기간 제한 없음</p>
-            <button type="button" class="date_picker_btn" w24-datepicker="multiple" data-dp-name="visitDates"><span class="blind">여러 날짜 선택</span></button>
-            <p>근무일 선택 · 주말 제외, 공휴일 추가·제외</p>
-            <button type="button" class="date_picker_btn" w24-datepicker="workday" data-dp-name="workDates" data-dp-count-target="#workday-count" data-dp-holidays="2026-12-25" data-dp-holidays-add="2026-12-24,2026-12-31" data-dp-holidays-exclude="2026-12-24" data-dp-value="2026-12-29"><span class="blind">근무일 선택</span></button>
-            <label for="workday-count">선택한 근무일 수</label>
-            <input id="workday-count" type="text" name="workdayCount" readonly>
-            <p>월 선택</p>
-            <button type="button" class="date_picker_btn" w24-datepicker="month" data-dp-name="visitMonth"><span class="blind">월 선택</span></button>
-            <p lang="en">English example</p>
-            <button type="button" class="date_picker_btn" w24-datepicker="single" data-dp-lang="en" data-dp-name="englishDate"><span class="blind">Choose date</span></button>
+        <form class="datepicker-demo-list">
+            <div class="datepicker-demo-item">
+                <h2>단일 날짜 선택</h2>
+                <button type="button" class="date_picker_btn" w24-datepicker="single" data-dp-name="visitDate"></button>
+            </div>
+            <div class="datepicker-demo-item">
+                <h2>다중 날짜 선택 · 선택 월 고정</h2>
+                <button type="button" class="date_picker_btn" w24-datepicker="multiple" data-dp-name="limitedDates" data-dp-locked-month="2026-12" data-dp-value="2026-12-05,2026-12-08,2026-12-09,2026-12-12"><span class="blind">지정 월 내 날짜 선택</span></button>
+            </div>
+            <div class="datepicker-demo-item">
+                <h2>다중 날짜 선택 · 기간 제한 없음</h2>
+                <button type="button" class="date_picker_btn" w24-datepicker="multiple" data-dp-name="visitDates"><span class="blind">여러 날짜 선택</span></button>
+            </div>
+            <div class="datepicker-demo-item">
+                <h2>근무일 선택 · 주말 제외, 공휴일 추가·제외</h2>
+                <button type="button" class="date_picker_btn" w24-datepicker="workday" data-dp-name="workDates" data-dp-count-target="#workday-count" data-dp-holidays="2026-12-25" data-dp-holidays-add="2026-12-24,2026-12-31" data-dp-holidays-exclude="2026-12-24" data-dp-value="2026-12-29"><span class="blind">근무일 선택</span></button>
+                <label for="workday-count">선택한 근무일 수</label>
+                <input id="workday-count" type="text" name="workdayCount" readonly>
+            </div>
+            <div class="datepicker-demo-item">
+                <h2>월 선택</h2>
+                <button type="button" class="date_picker_btn" w24-datepicker="month" data-dp-name="visitMonth"><span class="blind">월 선택</span></button>
+            </div>
+            <div class="datepicker-demo-item">
+                <h2 lang="en">English example</h2>
+                <button type="button" class="date_picker_btn" w24-datepicker="single" data-dp-lang="en" data-dp-name="englishDate"><span class="blind">Choose date</span></button>
+            </div>
         </form>
     </main>
 </body>
