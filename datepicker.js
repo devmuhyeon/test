@@ -304,6 +304,13 @@
         if (target) target.focus();
     }
 
+    function todayButtonDisabled(state, date) {
+        var today = state.today;
+        var sameYear = date.getFullYear() === today.getFullYear();
+        var containsToday = sameYear && (state.monthOnly || date.getMonth() === today.getMonth());
+        return containsToday || today < state.min || today > state.max;
+    }
+
     function render(state, focusDate) {
         var date = state.cursor;
         var year = date.getFullYear();
@@ -330,8 +337,7 @@
         state.$prev.prop('disabled', moveMonth(date, -step).getFullYear() < state.min.getFullYear() || !!state.locked);
         state.$next.prop('disabled', moveMonth(date, step).getFullYear() > state.max.getFullYear() || !!state.locked);
         var current = format(state.today, state.monthOnly);
-        state.$today.prop('disabled', !canSelect(state, state.today) ||
-            format(date, state.monthOnly) === current);
+        state.$today.prop('disabled', todayButtonDisabled(state, date));
 
         state.$body.empty();
         var $row;
@@ -361,11 +367,13 @@
             var focused = key === format(date, state.monthOnly);
             $cell.attr({ 'data-dp-date': key, tabindex: focused ? '0' : '-1', 'aria-selected': String(selected) });
             if (key === current) $cell.attr('aria-current', state.monthOnly ? 'true' : 'date');
-            if (!state.monthOnly && inPeriod && selected) {
-                var prev = format(new Date(year, month, item.getDate() - 1), false);
-                var next = format(new Date(year, month, item.getDate() + 1), false);
-                $cell.toggleClass('w24dp_joined_prev', i % columns !== 0 && item.getDate() > 1 && $.inArray(prev, state.draft) !== -1);
-                $cell.toggleClass('w24dp_joined_next', i % columns !== columns - 1 && item.getDate() < new Date(year, month + 1, 0).getDate() && $.inArray(next, state.draft) !== -1);
+            if (!state.monthOnly && selected) {
+                var prev = format(new Date(item.getFullYear(), item.getMonth(), item.getDate() - 1), false);
+                var next = format(new Date(item.getFullYear(), item.getMonth(), item.getDate() + 1), false);
+                $cell.toggleClass('w24dp_joined_prev', i % columns !== 0 &&
+                    (i > start || nextPeriod) && $.inArray(prev, state.draft) !== -1);
+                $cell.toggleClass('w24dp_joined_next', i % columns !== columns - 1 &&
+                    $.inArray(next, state.draft) !== -1);
             }
         }
 

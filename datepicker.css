@@ -155,6 +155,7 @@
 .w24dp_grid:not(.w24dp_month_grid) [data-dp-date]:hover .w24dp_date { background: #f0f0f0; }
 .w24dp_grid [aria-disabled="true"] .w24dp_date,
 .w24dp_dialog button:disabled { border-color: #d6d6d6; color: #767676; cursor: default; }
+.w24dp_dialog [data-dp-action="today"]:disabled { background: #eee; border-color: #eee; }
 .w24dp_grid [aria-current] .w24dp_date {
     border-color: #3953cb;
     background: #f1f4ff;
