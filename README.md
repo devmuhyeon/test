@@ -24,6 +24,21 @@
 
 버튼 본문에 `방문일`처럼 필드명을 넣으면 선택값과 함께 버튼의 접근 가능한 이름으로 자동 사용합니다. 본문이 비어 있으면 달력 유형에 맞는 기본 이름을 사용합니다.
 
+## 주말과 공휴일 설정
+
+```html
+<button type="button" w24-datepicker="day" data-dp-name="workDate" data-dp-disable-weekends="true" data-dp-holidays="2026-12-25" data-dp-holidays-add="2026-12-24,2026-12-31" data-dp-holidays-exclude="2026-12-24">근무일 선택</button>
+```
+
+| 속성 | 값 |
+| --- | --- |
+| `data-dp-disable-weekends` | `true`이면 토·일 선택 불가. 생략하거나 `false`이면 주말 선택 가능 |
+| `data-dp-holidays` | JSP에서 전달하는 기본 공휴일 목록 |
+| `data-dp-holidays-add` | 기본 목록에 추가할 날짜 |
+| `data-dp-holidays-exclude` | 기본·추가 목록에서 공휴일 처리를 해제할 날짜 |
+
+날짜는 `YYYY-MM-DD`로 지정하고 여러 날짜는 쉼표로 구분합니다. 공휴일 제외가 기본·추가 공휴일보다 우선합니다. 주말 비활성화가 켜져 있으면 공휴일 목록에서 제외한 토·일도 선택할 수 없습니다. 일 단위인 `day`와 `multi`에 적용됩니다. 국가 공휴일 데이터는 화면의 JSP에서 전달합니다.
+
 ## 키보드
 
 - Enter/Space로 열면 선택 날짜 또는 오늘에 포커스가 갑니다. 지정 월이 오늘과 다르면 해당 월 범위의 날짜에 포커스합니다.

@@ -48,6 +48,30 @@
         return $button;
     }
 
+    function dateList($trigger, attribute) {
+        var raw = $trigger.attr(attribute) || '';
+        return $.grep(raw.split(/[,\s]+/), function (value) { return !!parse(value, false); });
+    }
+
+    function canSelect(state, date) {
+        if (date < state.min || date > state.max) return false;
+        if (state.monthOnly) return true;
+        var weekday = date.getDay();
+        if (state.disableWeekends && (weekday === 0 || weekday === 6)) return false;
+        return !state.holidays[format(date, false)];
+    }
+
+    function findDate(state, date, direction, first, last) {
+        var candidate = new Date(+date);
+        first = first || state.min;
+        last = last || state.max;
+        while (candidate >= first && candidate <= last) {
+            if (canSelect(state, candidate)) return candidate;
+            candidate.setDate(candidate.getDate() + direction);
+        }
+        return null;
+    }
+
     function setup(element) {
         var $trigger = $(element);
         var mode = $trigger.attr('w24-datepicker');
@@ -67,8 +91,17 @@
             monthOnly: mode === 'month', multi: mode === 'multi',
             min: new Date(1900, 0, 1), max: new Date(2100, 11, 31),
             locked: mode === 'multi' ? parse($trigger.attr('data-dp-locked-month'), true) : null,
+            disableWeekends: $trigger.attr('data-dp-disable-weekends') === 'true',
+            holidays: {},
             label: $trigger.text().replace(/\s+/g, ' ').trim() || languages[lang][mode]
         };
+
+        $.each(dateList($trigger, 'data-dp-holidays').concat(dateList($trigger, 'data-dp-holidays-add')), function (_, value) {
+            state.holidays[value] = true;
+        });
+        $.each(dateList($trigger, 'data-dp-holidays-exclude'), function (_, value) {
+            delete state.holidays[value];
+        });
 
         if (state.locked) {
             state.min = state.locked;
@@ -85,7 +118,7 @@
         var initialValues = initial.split(',');
         var values = $.grep(initialValues, function (value, index) {
             var date = parse(value, state.monthOnly);
-            return date && date >= state.min && date <= state.max && $.inArray(value, initialValues) === index;
+            return date && canSelect(state, date) && $.inArray(value, initialValues) === index;
         }).sort();
         setValue(state, state.multi ? values : values.slice(0, 1));
         return state;
@@ -135,10 +168,21 @@
         return target;
     }
 
+    function focusCalendar(state) {
+        var $date = state.$body.find('[tabindex="0"]');
+        ($date.length ? $date : state.$dialog.find('[data-dp-action="close"]')).trigger('focus');
+    }
+
     function render(state, focusDate) {
         var date = state.cursor;
         var year = date.getFullYear();
         var month = date.getMonth();
+        if (!canSelect(state, date)) {
+            var first = new Date(year, month, 1);
+            var last = new Date(year, month + 1, 0);
+            var preferred = findDate(state, date, 1, first, last) || findDate(state, date, -1, first, last);
+            if (preferred) state.cursor = date = preferred;
+        }
         var words = state.words;
         var count = state.monthOnly ? 12 : 7 * Math.ceil(
             (new Date(year, month, 1).getDay() + new Date(year, month + 1, 0).getDate()) / 7
@@ -155,7 +199,7 @@
         state.$prev.prop('disabled', moveMonth(date, -step).getFullYear() < state.min.getFullYear() || !!state.locked);
         state.$next.prop('disabled', moveMonth(date, step).getFullYear() > state.max.getFullYear() || !!state.locked);
         var current = format(state.today, state.monthOnly);
-        state.$today.prop('disabled', state.today < state.min || state.today > state.max ||
+        state.$today.prop('disabled', !canSelect(state, state.today) ||
             format(date, state.monthOnly) === current);
 
         state.$body.empty();
@@ -166,7 +210,7 @@
             var key = format(item, state.monthOnly);
             var inPeriod = state.monthOnly || item.getMonth() === month;
             var selected = inPeriod && $.inArray(key, state.draft) !== -1;
-            var enabled = inPeriod && item >= state.min && item <= state.max;
+            var enabled = inPeriod && canSelect(state, item);
             var label = describe(state, item);
             var $cell = $('<td>').appendTo($row);
 
@@ -192,7 +236,7 @@
             }
         }
 
-        if (focusDate) state.$body.find('[tabindex="0"]').trigger('focus');
+        if (focusDate) focusCalendar(state);
     }
 
     function renderSelection(state) {
@@ -265,7 +309,17 @@
         event.preventDefault();
         if (state.monthOnly) date = moveMonth(date, offset);
         else date.setDate(date.getDate() + offset);
-        state.cursor = clamp(state, date);
+        var candidate = clamp(state, date);
+        if (!state.monthOnly && !canSelect(state, candidate)) {
+            var direction = code === 36 ? 1 : code === 35 ? -1 : (offset < 0 || code === 33 ? -1 : 1);
+            var first = code === 36 ? date : null;
+            var last = code === 35 ? date : null;
+            if (first) last = new Date(first.getFullYear(), first.getMonth(), first.getDate() + 6);
+            else if (last) first = new Date(last.getFullYear(), last.getMonth(), last.getDate() - 6);
+            candidate = findDate(state, candidate, direction, first, last);
+            if (!candidate) return;
+        }
+        state.cursor = candidate;
         render(state, true);
     }
 
@@ -313,7 +367,7 @@
                 var amount = (action === 'prev' ? -1 : 1) * (state.monthOnly ? 12 : 1);
                 state.cursor = clamp(state, action === 'today' ? state.today : moveMonth(state.cursor, amount));
                 render(state, action === 'today');
-                if (this.disabled) state.$body.find('[tabindex="0"]').trigger('focus');
+                if (this.disabled) focusCalendar(state);
             }
         });
     }
@@ -382,7 +436,7 @@
         state.$trigger.attr({ 'aria-expanded': 'true', 'aria-controls': id });
         render(state, false);
         position(state);
-        state.$body.find('[tabindex="0"]').trigger('focus');
+        focusCalendar(state);
         state.$background = state.$layer.siblings().not('script, style, link').each(function () {
             var $item = $(this);
             $item.data('work24DatepickerBackground', { aria: $item.attr('aria-hidden'), inert: $item.is('[inert]') });
@@ -397,7 +451,7 @@
             if (!active) open(setup(this));
         }).on('focusin.work24Datepicker', function (event) {
             if (active && !$.contains(active.$dialog[0], event.target)) {
-                active.$body.find('[tabindex="0"]').trigger('focus');
+                focusCalendar(active);
             }
         });
     });
