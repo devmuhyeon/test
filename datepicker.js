@@ -478,6 +478,8 @@
     function bind(state) {
         state.$layer.on('keydown', function (event) {
             handlePopupKey(state, event);
+        }).on('click', function (event) {
+            event.work24DatepickerInside = true;
         }).on('click', '[data-dp-date]', function () {
             state.cursor = parse($(this).attr('data-dp-date'), state.monthOnly);
             select(state, $(this).attr('data-dp-date'));
@@ -581,7 +583,8 @@
 
     $(function () {
         $(trigger).each(function () { setup(this); });
-        $(document).on('click.work24Datepicker', trigger, function () {
+        $(document).on('click.work24Datepicker', trigger, function (event) {
+            event.work24DatepickerInside = true;
             var state = setup(this);
             if (active === state) {
                 close(state, false);
@@ -592,7 +595,7 @@
         }).on('keydown.work24Datepicker', trigger, function (event) {
             if (active && active.$trigger[0] === this) handlePopupKey(active, event);
         }).on('click.work24Datepicker focusin.work24Datepicker', function (event) {
-            if (!active) return;
+            if (!active || event.work24DatepickerInside) return;
             var target = event.target;
             if (target === active.$trigger[0] || $.contains(active.$trigger[0], target) ||
                 target === active.$dialog[0] || $.contains(active.$dialog[0], target)) return;
