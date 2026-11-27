@@ -1751,6 +1751,7 @@ function swiperActiveIndex(swiper) {
 
     function canSelect(state, date) {
         if (date < state.min || date > state.max) return false;
+        if (state.fixedMonth !== null && state.fixedMonth !== undefined && date.getMonth() !== state.fixedMonth) return false;
         if (state.monthOnly) return true;
         var weekday = date.getDay();
         if (state.disableWeekends && (weekday === 0 || weekday === 6)) return false;
@@ -1842,23 +1843,27 @@ function swiperActiveIndex(swiper) {
         }
 
         var years = yearBounds($trigger);
+        var monthSetting = $trigger.attr('data-dp-locked-month');
+        var absoluteMonth = parse(monthSetting, true);
+        var fixedYear = absoluteMonth ? absoluteMonth.getFullYear() : configuredYear($trigger, 'data-dp-locked-year');
+        var fixedMonth = absoluteMonth ? absoluteMonth.getMonth() :
+            (/^(0?[1-9]|1[0-2])$/.test(monthSetting) ? Number(monthSetting) - 1 : null);
+        if (fixedYear) years = { min: fixedYear, max: fixedYear };
         state = {
             $trigger: $trigger, $display: $display, $field: $field, $value: $value, mode: mode, lang: lang, words: languages[lang],
             monthOnly: mode === 'month', multi: multi,
             $countTarget: workday && countTarget ? $countScope.find(countTarget).filter('input').first() : $(),
             years: years,
             min: new Date(years.min || 1000, 0, 1), max: new Date(years.max || 9999, 11, 31),
-            locked: multi ? parse($trigger.attr('data-dp-locked-month'), true) : null,
+            fixedYear: fixedYear, fixedMonth: fixedMonth,
             disableWeekends: disableWeekends === undefined ? workday : disableWeekends === 'true',
             holidays: buildHolidays($trigger),
             label: label || languages[lang][mode]
         };
 
-        if (state.locked) {
-            var lockedYear = state.locked.getFullYear();
-            state.years = { min: lockedYear, max: lockedYear };
-            state.min = state.locked;
-            state.max = new Date(state.locked.getFullYear(), state.locked.getMonth() + 1, 0);
+        if (fixedMonth !== null) {
+            state.min = new Date(state.min.getFullYear(), fixedMonth, 1);
+            state.max = new Date(state.max.getFullYear(), fixedMonth + 1, 0);
         }
 
         $trigger.data('work24Datepicker', state).attr({
@@ -1986,7 +1991,8 @@ function swiperActiveIndex(swiper) {
         var today = state.today;
         var sameYear = date.getFullYear() === today.getFullYear();
         var containsToday = sameYear && (state.monthOnly || date.getMonth() === today.getMonth());
-        return containsToday || today < state.min || today > state.max;
+        return containsToday || today < state.min || today > state.max ||
+            (state.fixedMonth !== null && today.getMonth() !== state.fixedMonth);
     }
 
     function render(state, focusDate) {
@@ -2011,9 +2017,9 @@ function swiperActiveIndex(swiper) {
 
         updateYearOptions(state, year);
         state.$month.val(month);
-        var step = state.monthOnly ? 12 : 1;
-        state.$prev.prop('disabled', moveMonth(date, -step).getFullYear() < state.min.getFullYear() || !!state.locked);
-        state.$next.prop('disabled', moveMonth(date, step).getFullYear() > state.max.getFullYear() || !!state.locked);
+        var step = state.monthOnly || state.fixedMonth !== null ? 12 : 1;
+        state.$prev.prop('disabled', moveMonth(date, -step).getFullYear() < state.min.getFullYear());
+        state.$next.prop('disabled', moveMonth(date, step).getFullYear() > state.max.getFullYear());
         var current = format(state.today, state.monthOnly);
         state.$today.prop('disabled', todayButtonDisabled(state, date));
 
@@ -2024,13 +2030,13 @@ function swiperActiveIndex(swiper) {
             var item = state.monthOnly ? new Date(year, i, 1) : new Date(year, month, i - start + 1);
             var key = format(item, state.monthOnly);
             var inPeriod = state.monthOnly || item.getMonth() === month;
-            var nextPeriod = !inPeriod && item > date && !state.locked;
+            var nextPeriod = !inPeriod && item > date && state.fixedMonth === null;
             var enabled = (inPeriod || nextPeriod) && canSelect(state, item);
             var selected = enabled && $.inArray(key, state.draft) !== -1;
             var label = describe(state, item);
             var $cell = $('<td>').appendTo($row);
 
-            if (!inPeriod && state.locked) continue;
+            if (!inPeriod && state.fixedMonth !== null) continue;
             var $item = $('<span class="w24dp_date">')
                 .text(state.monthOnly ? (state.lang === 'ko' ? words.months[i] : words.months[i].slice(0, 3)) : item.getDate())
                 .appendTo($cell);
@@ -2119,7 +2125,7 @@ function swiperActiveIndex(swiper) {
         else if (code === 36) offset = -(state.monthOnly ? date.getMonth() % step : date.getDay());
         else if (code === 35) offset = step - 1 - (state.monthOnly ? date.getMonth() % step : date.getDay());
         else if (code === 33 || code === 34) {
-            date = moveMonth(date, (code === 33 ? -1 : 1) * (state.monthOnly || event.shiftKey ? 12 : 1));
+            date = moveMonth(date, (code === 33 ? -1 : 1) * (state.monthOnly || state.fixedMonth !== null || event.shiftKey ? 12 : 1));
         } else return;
 
         event.preventDefault();
@@ -2127,7 +2133,7 @@ function swiperActiveIndex(swiper) {
         if (state.monthOnly) date = moveMonth(date, offset);
         else date.setDate(date.getDate() + offset);
         var candidate = clamp(state, date);
-        if (!state.monthOnly && !canSelect(state, candidate)) {
+        if ((!state.monthOnly || state.fixedMonth !== null) && !canSelect(state, candidate)) {
             var direction = code === 36 ? 1 : code === 35 ? -1 : (offset < 0 || code === 33 ? -1 : 1);
             var first = code === 36 ? date : null;
             var last = code === 35 ? date : null;
@@ -2189,7 +2195,7 @@ function swiperActiveIndex(swiper) {
                     ($remaining.length ? $remaining.eq(Math.min(index, $remaining.length - 1)) : state.$reset).trigger('focus');
                 }
             } else {
-                var amount = (action === 'prev' ? -1 : 1) * (state.monthOnly ? 12 : 1);
+                var amount = (action === 'prev' ? -1 : 1) * (state.monthOnly || state.fixedMonth !== null ? 12 : 1);
                 state.cursor = clamp(state, action === 'today' ? state.today : moveMonth(state.cursor, amount));
                 render(state, action === 'today');
                 if (this.disabled) focusCalendar(state);
@@ -2206,7 +2212,11 @@ function swiperActiveIndex(swiper) {
         var selected = parse(current, state.monthOnly);
         state.draft = state.multi ? (current ? current.split(',') : []) :
             (selected && canSelect(state, selected) ? [current] : []);
-        state.cursor = clamp(state, parse(state.draft[0], state.monthOnly) || state.today);
+        var initial = parse(state.draft[0], state.monthOnly) || state.today;
+        if (state.fixedMonth !== null && initial.getMonth() !== state.fixedMonth) {
+            initial = new Date(initial.getFullYear(), state.fixedMonth, 1);
+        }
+        state.cursor = clamp(state, initial);
 
         var id = 'w24dp_dialog';
         while (document.getElementById(id) || document.getElementById(id + '_heading')) id += '_1';
@@ -2216,21 +2226,33 @@ function swiperActiveIndex(swiper) {
             .toggleClass('w24dp_month_dialog', state.monthOnly).appendTo(state.$layer);
         var $main = $('<div class="w24dp_main">').appendTo(state.$dialog);
         var $header = $('<div class="w24dp_header">').appendTo($main);
-        var unit = state.monthOnly ? words.year : words.monthField;
-        var prevLabel = state.lang === 'ko' ? words.prev + ' ' + (state.monthOnly ? '해' : '달') : words.prev + ' ' + unit.toLowerCase();
-        var nextLabel = state.lang === 'ko' ? words.next + ' ' + (state.monthOnly ? '해' : '달') : words.next + ' ' + unit.toLowerCase();
-        state.$prev = button('‹', 'prev', prevLabel).appendTo($header);
-        state.$year = $('<select>').attr('aria-label', words.year).appendTo($header);
+        var moveByYear = state.monthOnly || state.fixedMonth !== null;
+        var unit = moveByYear ? words.year : words.monthField;
+        var prevLabel = state.lang === 'ko' ? words.prev + ' ' + (moveByYear ? '해' : '달') : words.prev + ' ' + unit.toLowerCase();
+        var nextLabel = state.lang === 'ko' ? words.next + ' ' + (moveByYear ? '해' : '달') : words.next + ' ' + unit.toLowerCase();
+        var hideNavigation = state.fixedYear && moveByYear;
+        state.$prev = button('‹', 'prev', prevLabel);
+        state.$next = button('›', 'next', nextLabel);
+        state.$year = $('<select>').attr('aria-label', words.year);
         state.$month = $('<select>').attr('aria-label', words.monthField);
-        if (!state.monthOnly) state.$month.appendTo($header);
-        state.$next = button('›', 'next', nextLabel).appendTo($header);
+        if (!hideNavigation) state.$prev.appendTo($header);
+        if (state.fixedYear) {
+            var yearLabel = String(state.fixedYear) + (state.lang === 'ko' ? '년' : '');
+            if (state.fixedMonth !== null) yearLabel += ' ' + words.months[state.fixedMonth];
+            $('<span>').text(yearLabel).appendTo($header);
+        } else {
+            state.$year.appendTo($header);
+            if (state.fixedMonth !== null) $('<span>').text(words.months[state.fixedMonth]).appendTo($header);
+        }
+        if (!state.monthOnly && state.fixedMonth === null) state.$month.appendTo($header);
+        if (!hideNavigation) state.$next.appendTo($header);
+        else $header.css('justify-content', 'center');
         state.$heading = $('<h2 class="w24dp_sr" aria-live="polite" aria-atomic="true">')
             .attr('id', id + '_heading').appendTo($main);
 
         $.each(words.months, function (month, label) {
             $('<option>').val(month).text(label).appendTo(state.$month);
         });
-        if (state.locked) state.$year.add(state.$month).prop('disabled', true);
 
         var $grid = $('<table role="grid" class="w24dp_grid">')
             .attr('aria-labelledby', id + '_heading').toggleClass('w24dp_month_grid', state.monthOnly).appendTo($main);
