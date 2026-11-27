@@ -46,9 +46,10 @@
     cursor: pointer;
 }
 .w24dp-field button.btn_calendar.w24dp-trigger:disabled { cursor: default; opacity: .45; }
-.w24dp-layer { position: fixed; z-index: 10090; top: 0; right: 0; bottom: 0; left: 0; }
+.w24dp-layer { position: fixed; z-index: 10090; top: 0; right: 0; bottom: 0; left: 0; pointer-events: none; }
 .w24dp-dialog {
     position: fixed;
+    pointer-events: auto;
     box-sizing: border-box;
     max-height: calc(100% - 16px);
     max-width: calc(100% - 16px);
@@ -150,8 +151,7 @@
 .w24dp-dialog .w24dp-month-grid { padding: 4px 5px 5px; border-spacing: 4px; }
 .w24dp-month-grid .w24dp-date { height: 40px; line-height: 38px; }
 .w24dp-grid [data-dp-date] { cursor: pointer; }
-.w24dp-grid [data-dp-date]:hover .w24dp-date,
-.w24dp-dialog button:hover:enabled { background: #f0f0f0; }
+.w24dp-grid:not(.w24dp-month-grid) [data-dp-date]:hover .w24dp-date { background: #f0f0f0; }
 .w24dp-grid [aria-disabled="true"] .w24dp-date,
 .w24dp-dialog button:disabled { border-color: #d6d6d6; color: #767676; cursor: default; }
 .w24dp-grid [aria-current] .w24dp-date {
@@ -169,8 +169,7 @@
     color: #fff;
     font-weight: bold;
 }
-.w24dp-grid [aria-selected="true"]:hover .w24dp-date,
-.w24dp-dialog [data-dp-action="apply"]:hover { background: #2c3fa8; }
+.w24dp-grid:not(.w24dp-month-grid) [aria-selected="true"]:hover .w24dp-date { background: #2c3fa8; }
 .w24dp-joined-prev .w24dp-date { margin-left: -1px; border-top-left-radius: 0 !important; border-bottom-left-radius: 0 !important; }
 .w24dp-joined-next .w24dp-date { margin-right: -1px; border-top-right-radius: 0 !important; border-bottom-right-radius: 0 !important; }
 .w24dp-summary strong { color: #3046b9; }

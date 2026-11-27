@@ -291,7 +291,8 @@
 
     function focusCalendar(state) {
         var $date = state.$body.find('[tabindex="0"]');
-        ($date.length ? $date : state.$dialog.find('[data-dp-action="close"]')).trigger('focus');
+        var target = ($date.length ? $date : state.$dialog.find('[data-dp-action="close"]'))[0];
+        if (target) target.focus();
     }
 
     function render(state, focusDate) {
@@ -371,20 +372,14 @@
         });
     }
 
-    function close(state, commit) {
+    function close(state, commit, restoreFocus) {
         var previous = state.$value.val();
         if (commit) setValue(state, state.draft);
         active = null;
         $(window).off('.work24Datepicker');
-        state.$background.each(function () {
-            var old = $(this).data('work24DatepickerBackground');
-            if (old.aria === undefined) $(this).removeAttr('aria-hidden');
-            else $(this).attr('aria-hidden', old.aria);
-            if (!old.inert) $(this).removeAttr('inert');
-            $(this).removeData('work24DatepickerBackground');
-        });
         state.$layer.remove();
-        state.$trigger.attr('aria-expanded', 'false').removeAttr('aria-controls').trigger('focus');
+        state.$trigger.attr('aria-expanded', 'false').removeAttr('aria-controls');
+        if (restoreFocus !== false) state.$trigger[0].focus();
         if (commit && previous !== state.$value.val()) {
             state.$value.trigger('change');
             if (state.multi) state.$display.trigger('change');
@@ -410,12 +405,13 @@
     function gridKey(state, event) {
         var date = parse($(event.target).attr('data-dp-date'), state.monthOnly);
         if (!date) return;
-        var code = event.which;
+        var code = event.which || event.keyCode;
         var step = state.monthOnly ? 4 : 7;
         var offset = 0;
 
         if (code === 13 || code === 32) {
             event.preventDefault();
+            event.stopPropagation();
             select(state, format(date, state.monthOnly));
             return;
         }
@@ -430,6 +426,7 @@
         } else return;
 
         event.preventDefault();
+        event.stopPropagation();
         if (state.monthOnly) date = moveMonth(date, offset);
         else date.setDate(date.getDate() + offset);
         var candidate = clamp(state, date);
@@ -446,24 +443,30 @@
         render(state, true);
     }
 
+    function handlePopupKey(state, event) {
+        var code = event.which || event.keyCode;
+        if (code === 27) {
+            event.preventDefault();
+            event.stopPropagation();
+            close(state, false);
+        } else if (code === 9) {
+            var $stops = state.$trigger.add(state.$dialog.find('button, select, [tabindex="0"]'))
+                .filter(':visible:not(:disabled)');
+            var index = $stops.index(document.activeElement);
+            var next = index < 0 ? (event.shiftKey ? $stops.length - 1 : 0) :
+                (index + (event.shiftKey ? -1 : 1) + $stops.length) % $stops.length;
+            if (!$stops.length) return;
+            event.preventDefault();
+            event.stopPropagation();
+            $stops[next].focus();
+        } else {
+            gridKey(state, event);
+        }
+    }
+
     function bind(state) {
         state.$layer.on('keydown', function (event) {
-            if (event.which === 27) {
-                event.preventDefault();
-                event.stopPropagation();
-                close(state, false);
-                return;
-            }
-            if (event.which === 9) {
-                var $stops = state.$dialog.find('button, select, [tabindex="0"]').filter(':visible:not(:disabled)');
-                var index = $stops.index(document.activeElement);
-                var next = index < 0 ? (event.shiftKey ? $stops.length - 1 : 0) :
-                    (index + (event.shiftKey ? -1 : 1) + $stops.length) % $stops.length;
-                event.preventDefault();
-                $stops.eq(next).trigger('focus');
-                return;
-            }
-            gridKey(state, event);
+            handlePopupKey(state, event);
         }).on('click', '[data-dp-date]', function () {
             state.cursor = parse($(this).attr('data-dp-date'), state.monthOnly);
             select(state, $(this).attr('data-dp-date'));
@@ -509,7 +512,7 @@
         var id = 'w24dp-dialog';
         while (document.getElementById(id) || document.getElementById(id + '-heading')) id += '-1';
         state.$layer = $('<div class="w24dp-layer">').appendTo('body');
-        state.$dialog = $('<div class="w24dp-dialog" role="dialog" aria-modal="true">')
+        state.$dialog = $('<div class="w24dp-dialog" role="dialog">')
             .attr({ id: id, lang: state.lang, 'aria-label': state.label })
             .toggleClass('w24dp-month-dialog', state.monthOnly).appendTo(state.$layer);
         var $main = $('<div class="w24dp-main">').appendTo(state.$dialog);
@@ -562,25 +565,27 @@
         render(state, false);
         position(state);
         focusCalendar(state);
-        state.$background = state.$layer.siblings().not('script, style, link').each(function () {
-            var $item = $(this);
-            $item.data('work24DatepickerBackground', { aria: $item.attr('aria-hidden'), inert: $item.is('[inert]') });
-            $item.attr({ 'aria-hidden': 'true', inert: '' });
-        });
-        $(window).on('resize.work24Datepicker', function () { position(state); });
+        $(window).on('resize.work24Datepicker scroll.work24Datepicker', function () { position(state); });
     }
 
     $(function () {
         $(trigger).each(function () { setup(this); });
         $(document).on('click.work24Datepicker', trigger, function () {
-            if (!active) {
-                var state = setup(this);
-                if (!state.$display.prop('disabled')) open(state);
+            var state = setup(this);
+            if (active === state) {
+                close(state, false);
+                return;
             }
-        }).on('focusin.work24Datepicker', function (event) {
-            if (active && !$.contains(active.$dialog[0], event.target)) {
-                focusCalendar(active);
-            }
+            if (active) close(active, false, false);
+            if (!state.$display.prop('disabled')) open(state);
+        }).on('keydown.work24Datepicker', trigger, function (event) {
+            if (active && active.$trigger[0] === this) handlePopupKey(active, event);
+        }).on('click.work24Datepicker focusin.work24Datepicker', function (event) {
+            if (!active) return;
+            var target = event.target;
+            if (target === active.$trigger[0] || $.contains(active.$trigger[0], target) ||
+                target === active.$dialog[0] || $.contains(active.$dialog[0], target)) return;
+            close(active, false, false);
         });
     });
 })(jQuery);
