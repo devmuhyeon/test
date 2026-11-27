@@ -2,7 +2,7 @@
 ;(function ($) {
     'use strict';
 
-    var trigger = 'button[data-work24-datepicker]';
+    var trigger = 'button[w24-datepicker], button[data-work24-datepicker]';
     var active;
     var languages = {
         ko: {
@@ -50,7 +50,8 @@
 
     function setup(element) {
         var $trigger = $(element);
-        var mode = $trigger.attr('data-work24-datepicker');
+        var mode = $trigger.attr('w24-datepicker');
+        if (mode === undefined) mode = $trigger.attr('data-work24-datepicker');
         if (mode !== 'month' && mode !== 'multi') mode = 'day';
 
         var state = $trigger.data('work24Datepicker');
@@ -66,7 +67,7 @@
             monthOnly: mode === 'month', multi: mode === 'multi',
             min: new Date(1900, 0, 1), max: new Date(2100, 11, 31),
             locked: mode === 'multi' ? parse($trigger.attr('data-dp-locked-month'), true) : null,
-            label: $trigger.attr('data-dp-label') || languages[lang][mode]
+            label: $trigger.text().replace(/\s+/g, ' ').trim() || languages[lang][mode]
         };
 
         if (state.locked) {
