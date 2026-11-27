@@ -6,7 +6,7 @@
     var active;
     var languages = {
         ko: {
-            day: '날짜 선택', month: '월 선택', multi: '다중 날짜 선택',
+            day: '날짜 선택', month: '월 선택', multi: '다중 날짜 선택', workday: '근무일 선택',
             year: '연도', monthField: '월', prev: '이전', next: '다음',
             today: '오늘', thisMonth: '이번 달', close: '닫기', apply: '적용',
             reset: '초기화', count: '선택한 일수', remove: '삭제',
@@ -15,7 +15,7 @@
             months: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
         },
         en: {
-            day: 'Choose date', month: 'Choose month', multi: 'Choose dates',
+            day: 'Choose date', month: 'Choose month', multi: 'Choose dates', workday: 'Choose working days',
             year: 'Year', monthField: 'Month', prev: 'Previous', next: 'Next',
             today: 'Today', thisMonth: 'This month', close: 'Close', apply: 'Apply',
             reset: 'Reset', count: 'Selected days', remove: 'Remove',
@@ -76,7 +76,10 @@
         var $trigger = $(element);
         var mode = $trigger.attr('w24-datepicker');
         if (mode === undefined) mode = $trigger.attr('data-work24-datepicker');
-        if (mode !== 'month' && mode !== 'multi') mode = 'day';
+        if (mode === 'multiple') mode = 'multi';
+        if (mode !== 'month' && mode !== 'multi' && mode !== 'workday') mode = 'day';
+        var workday = mode === 'workday';
+        var multi = mode === 'multi' || workday;
 
         var state = $trigger.data('work24Datepicker');
         if (state) return state;
@@ -85,15 +88,18 @@
         var $name = $trigger.children('.blind').first();
         var label = ($name.length ? $name : $trigger).text().replace(/\s+/g, ' ').trim();
         var $value = $('<input type="hidden">');
+        var countTarget = $trigger.attr('data-dp-count-target');
+        var disableWeekends = $trigger.attr('data-dp-disable-weekends');
         var name = $trigger.attr('data-dp-name');
         if (name) $value.attr('name', name).insertAfter($trigger);
 
         state = {
             $trigger: $trigger, $value: $value, mode: mode, lang: lang, words: languages[lang],
-            monthOnly: mode === 'month', multi: mode === 'multi',
+            monthOnly: mode === 'month', multi: multi,
+            $countTarget: workday && countTarget ? $trigger.closest('form').find(countTarget).filter('input') : $(),
             min: new Date(1900, 0, 1), max: new Date(2100, 11, 31),
-            locked: mode === 'multi' ? parse($trigger.attr('data-dp-locked-month'), true) : null,
-            disableWeekends: $trigger.attr('data-dp-disable-weekends') === 'true',
+            locked: multi ? parse($trigger.attr('data-dp-locked-month'), true) : null,
+            disableWeekends: disableWeekends === undefined ? workday : disableWeekends === 'true',
             holidays: {},
             label: label || languages[lang][mode]
         };
@@ -114,8 +120,9 @@
             'aria-haspopup': 'dialog', 'aria-expanded': 'false', lang: lang
         });
 
+        if (!$name.length) $name = $('<span class="blind">').text(state.label);
         $name.detach();
-        $trigger.empty().addClass('w24dp-trigger').append($name);
+        $trigger.empty().addClass('date_picker_btn w24dp-trigger').append($name);
         state.$text = $('<span>').appendTo($trigger);
         state.$icon = $('<span class="w24dp-icon" aria-hidden="true">').appendTo($trigger);
         var initial = $trigger.attr('data-dp-value') || '';
@@ -136,6 +143,7 @@
         state.$text.text(text);
         state.$trigger.attr('aria-label', state.label + ' ' + text);
         state.$value.val(values.join(','));
+        state.$countTarget.val(values.length);
     }
 
     function describe(state, date) {
@@ -270,6 +278,7 @@
         state.$trigger.attr('aria-expanded', 'false').removeAttr('aria-controls').trigger('focus');
         if (commit && previous !== state.$value.val()) {
             state.$value.trigger('change');
+            state.$countTarget.trigger('change');
             state.$trigger.trigger('work24datepicker:change', [state.multi ? state.draft.slice() : state.$value.val()]);
         }
     }
