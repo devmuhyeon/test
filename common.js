@@ -1819,14 +1819,16 @@ function swiperActiveIndex(swiper) {
         label = label || $trigger.attr('title');
         if ($display.attr('title') && label) label = $display.attr('title') + ' ' + label;
 
-        var $field = $trigger.parent('.box_ipt, .w24dp-field');
+        var $field = $trigger.parent('.box_ipt, .w24dp_field');
         if (!$field.length) {
-            $display.add($trigger).wrapAll('<div class="w24dp-field">');
+            $display.add($trigger).wrapAll('<div class="w24dp_field">');
             $field = $trigger.parent();
         }
-        $field.toggleClass('w24dp-field-wide', multi);
+        $field.toggleClass('w24dp_field_wide', multi);
         var $value = multi ? $('<input type="hidden">') : $display;
         var countTarget = $trigger.attr('data-dp-count-target');
+        var $countScope = $trigger.closest('[data-dp-scope]');
+        if (!$countScope.length) $countScope = $trigger.closest('form');
         var disableWeekends = $trigger.attr('data-dp-disable-weekends');
         var displayName = $display.attr('name');
         var name = displayName || $trigger.attr('data-dp-name');
@@ -1843,7 +1845,7 @@ function swiperActiveIndex(swiper) {
         state = {
             $trigger: $trigger, $display: $display, $field: $field, $value: $value, mode: mode, lang: lang, words: languages[lang],
             monthOnly: mode === 'month', multi: multi,
-            $countTarget: workday && countTarget ? $trigger.closest('form').find(countTarget).filter('input') : $(),
+            $countTarget: workday && countTarget ? $countScope.find(countTarget).filter('input').first() : $(),
             years: years,
             min: new Date(years.min || 1000, 0, 1), max: new Date(years.max || 9999, 11, 31),
             locked: multi ? parse($trigger.attr('data-dp-locked-month'), true) : null,
@@ -1865,8 +1867,8 @@ function swiperActiveIndex(swiper) {
 
         if (!$name.length) $name = $('<span class="blind">').text(state.label);
         $name.detach();
-        $trigger.empty().addClass('btn_calendar w24dp-trigger').append($name);
-        if (!$field.is('.box_ipt')) $display.addClass('w24dp-display');
+        $trigger.empty().addClass('btn_calendar w24dp_trigger').append($name);
+        if (!$field.is('.box_ipt')) $display.addClass('w24dp_display');
         if (!$display.attr('placeholder')) {
             $display.attr('placeholder', mode === 'month' ? 'YYYY-MM' : 'YYYY-MM-DD');
         }
@@ -2022,7 +2024,7 @@ function swiperActiveIndex(swiper) {
             var $cell = $('<td>').appendTo($row);
 
             if (!inPeriod && state.locked) continue;
-            var $item = $('<span class="w24dp-date">')
+            var $item = $('<span class="w24dp_date">')
                 .text(state.monthOnly ? (state.lang === 'ko' ? words.months[i] : words.months[i].slice(0, 3)) : item.getDate())
                 .appendTo($cell);
 
@@ -2038,8 +2040,8 @@ function swiperActiveIndex(swiper) {
             if (!state.monthOnly && selected) {
                 var prev = format(new Date(year, month, item.getDate() - 1), false);
                 var next = format(new Date(year, month, item.getDate() + 1), false);
-                $cell.toggleClass('w24dp-joined-prev', i % columns !== 0 && item.getDate() > 1 && $.inArray(prev, state.draft) !== -1);
-                $cell.toggleClass('w24dp-joined-next', i % columns !== columns - 1 && item.getDate() < new Date(year, month + 1, 0).getDate() && $.inArray(next, state.draft) !== -1);
+                $cell.toggleClass('w24dp_joined_prev', i % columns !== 0 && item.getDate() > 1 && $.inArray(prev, state.draft) !== -1);
+                $cell.toggleClass('w24dp_joined_next', i % columns !== columns - 1 && item.getDate() < new Date(year, month + 1, 0).getDate() && $.inArray(next, state.draft) !== -1);
             }
         }
 
@@ -2194,14 +2196,14 @@ function swiperActiveIndex(swiper) {
             (selected && canSelect(state, selected) ? [current] : []);
         state.cursor = clamp(state, parse(state.draft[0], state.monthOnly) || state.today);
 
-        var id = 'w24dp-dialog';
-        while (document.getElementById(id) || document.getElementById(id + '-heading')) id += '-1';
-        state.$layer = $('<div class="w24dp-layer">').appendTo('body');
-        state.$dialog = $('<div class="w24dp-dialog" role="dialog">')
+        var id = 'w24dp_dialog';
+        while (document.getElementById(id) || document.getElementById(id + '_heading')) id += '_1';
+        state.$layer = $('<div class="w24dp_layer">').appendTo('body');
+        state.$dialog = $('<div class="w24dp_dialog" role="dialog">')
             .attr({ id: id, lang: state.lang, 'aria-label': state.label })
-            .toggleClass('w24dp-month-dialog', state.monthOnly).appendTo(state.$layer);
-        var $main = $('<div class="w24dp-main">').appendTo(state.$dialog);
-        var $header = $('<div class="w24dp-header">').appendTo($main);
+            .toggleClass('w24dp_month_dialog', state.monthOnly).appendTo(state.$layer);
+        var $main = $('<div class="w24dp_main">').appendTo(state.$dialog);
+        var $header = $('<div class="w24dp_header">').appendTo($main);
         var unit = state.monthOnly ? words.year : words.monthField;
         var prevLabel = state.lang === 'ko' ? words.prev + ' ' + (state.monthOnly ? '해' : '달') : words.prev + ' ' + unit.toLowerCase();
         var nextLabel = state.lang === 'ko' ? words.next + ' ' + (state.monthOnly ? '해' : '달') : words.next + ' ' + unit.toLowerCase();
@@ -2210,16 +2212,16 @@ function swiperActiveIndex(swiper) {
         state.$month = $('<select>').attr('aria-label', words.monthField);
         if (!state.monthOnly) state.$month.appendTo($header);
         state.$next = button('›', 'next', nextLabel).appendTo($header);
-        state.$heading = $('<h2 class="w24dp-sr" aria-live="polite" aria-atomic="true">')
-            .attr('id', id + '-heading').appendTo($main);
+        state.$heading = $('<h2 class="w24dp_sr" aria-live="polite" aria-atomic="true">')
+            .attr('id', id + '_heading').appendTo($main);
 
         $.each(words.months, function (month, label) {
             $('<option>').val(month).text(label).appendTo(state.$month);
         });
         if (state.locked) state.$year.add(state.$month).prop('disabled', true);
 
-        var $grid = $('<table role="grid" class="w24dp-grid">')
-            .attr('aria-labelledby', id + '-heading').toggleClass('w24dp-month-grid', state.monthOnly).appendTo($main);
+        var $grid = $('<table role="grid" class="w24dp_grid">')
+            .attr('aria-labelledby', id + '_heading').toggleClass('w24dp_month_grid', state.monthOnly).appendTo($main);
         if (state.multi) $grid.attr('aria-multiselectable', 'true');
         if (!state.monthOnly) {
             var $week = $('<tr>').appendTo($('<thead>').appendTo($grid));
@@ -2228,17 +2230,17 @@ function swiperActiveIndex(swiper) {
             });
         }
         state.$body = $('<tbody>').appendTo($grid);
-        var $footer = $('<div class="w24dp-footer">').appendTo($main);
+        var $footer = $('<div class="w24dp_footer">').appendTo($main);
         state.$today = button(state.monthOnly ? words.thisMonth : words.today, 'today').appendTo($footer);
         $('<span>').text(format(state.today, state.monthOnly)).appendTo($footer);
         button(words.close, 'close').appendTo($footer);
 
         if (state.multi) {
-            var $side = $('<div class="w24dp-side">').appendTo(state.$dialog);
-            var $summary = $('<div class="w24dp-summary" aria-live="polite" aria-atomic="true">').text(words.count).appendTo($side);
+            var $side = $('<div class="w24dp_side">').appendTo(state.$dialog);
+            var $summary = $('<div class="w24dp_summary" aria-live="polite" aria-atomic="true">').text(words.count).appendTo($side);
             state.$count = $('<strong>').appendTo($summary);
-            state.$list = $('<ul class="w24dp-list">').attr('aria-label', words.count).appendTo($side);
-            var $actions = $('<div class="w24dp-footer">').appendTo($side);
+            state.$list = $('<ul class="w24dp_list">').attr('aria-label', words.count).appendTo($side);
+            var $actions = $('<div class="w24dp_footer">').appendTo($side);
             state.$reset = button(words.reset, 'reset').prepend($('<span aria-hidden="true">').text('⟲ ')).appendTo($actions);
             button(words.apply, 'apply').appendTo($actions);
         }

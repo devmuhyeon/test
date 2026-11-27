@@ -54,18 +54,18 @@ var commonHolidays = ['2026-12-30', '2026-12-31'];
 
 ```html
 <label for="work-dates">날짜</label>
-<div class="w24dp-field">
+<div class="w24dp_field">
     <input type="text" id="work-dates" name="workDates">
-    <button type="button" class="btn_calendar" w24-datepicker="workday" data-dp-count-target="#workday-count" data-dp-holidays="2026-12-25" data-dp-holidays-add="2026-12-24,2026-12-31" data-dp-holidays-exclude="2026-12-24"><span class="blind">달력선택</span></button>
+    <button type="button" class="btn_calendar" w24-datepicker="workday" data-dp-count-target="#w24dp_demo_date_count_01" data-dp-holidays="2026-12-25" data-dp-holidays-add="2026-12-24,2026-12-31" data-dp-holidays-exclude="2026-12-24"><span class="blind">달력선택</span></button>
 </div>
-<label for="workday-count">날짜 개수</label>
-<input id="workday-count" name="workdayCount" type="text">
+<label for="w24dp_demo_date_count_01">날짜 개수</label>
+<input id="w24dp_demo_date_count_01" name="workdayCount" type="text">
 ```
 
 | 속성 | 값 |
 | --- | --- |
 | `data-dp-disable-weekends` | `true`이면 토·일 선택 불가, `false`이면 주말 선택 가능. `workday`는 생략 시 `true`, 나머지 유형은 `false` |
-| `data-dp-count-target` | 날짜 개수를 쓸 같은 폼 내 `input` 선택자 |
+| `data-dp-count-target` | 날짜 개수를 쓸 `input` 선택자. 가까운 `data-dp-scope` 영역에서 먼저 찾고, 영역이 없으면 같은 폼에서 찾습니다. 반복 배치할 때는 달력과 결과 입력란을 각각의 `data-dp-scope`로 감쌉니다. |
 | `data-dp-holidays` | 기존 마크업의 버튼별 공휴일 목록. 새 버튼은 `data-dp-holidays-add` 사용 |
 | `data-dp-holidays-add` | 기본 목록에 추가할 날짜 |
 | `data-dp-holidays-exclude` | 기본·추가 목록에서 공휴일 처리를 해제할 날짜 |
