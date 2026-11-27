@@ -1,6 +1,6 @@
 # PC 공통 데이트피커
 
-`index.html`을 열면 단일 날짜, 다중 날짜(월 고정/월 이동), 월 선택, 근무일 선택과 영문 예제를 확인할 수 있습니다.
+`index.html`을 열면 단일 날짜, 다중 날짜(월 고정/월 이동), 월 선택, 날짜 선택과 영문 예제를 확인할 수 있습니다.
 
 데모는 첨부된 첫 번째 CSS에 컴포넌트 CSS를 삽입한 `common.css`, 두 번째 CSS인 `layout.css`, `jquery-ui.css`, 그리고 첨부 JS에 컴포넌트를 추가한 `common.js`를 로드합니다. 공통 소스의 `/cm/static/` 경로에 있는 이미지와 폰트는 고용24 서버에서 제공됩니다.
 
@@ -53,19 +53,19 @@ var commonHolidays = ['2026-12-30', '2026-12-31'];
 특정 달력의 공휴일은 해당 `button`에 `data-dp-holidays-add="2026-12-24"`를 지정합니다. 버튼의 `data-dp-holidays-exclude`는 그 달력에서만 공통·개별 공휴일 처리를 해제합니다. 월 선택은 일 단위 공휴일의 영향을 받지 않습니다.
 
 ```html
-<label for="work-dates">근무일</label>
+<label for="work-dates">날짜</label>
 <div class="w24dp-field">
     <input type="text" id="work-dates" name="workDates">
     <button type="button" class="btn_calendar" w24-datepicker="workday" data-dp-count-target="#workday-count" data-dp-holidays="2026-12-25" data-dp-holidays-add="2026-12-24,2026-12-31" data-dp-holidays-exclude="2026-12-24"><span class="blind">달력선택</span></button>
 </div>
-<label for="workday-count">선택한 근무일 수</label>
+<label for="workday-count">날짜 개수</label>
 <input id="workday-count" name="workdayCount" type="text">
 ```
 
 | 속성 | 값 |
 | --- | --- |
 | `data-dp-disable-weekends` | `true`이면 토·일 선택 불가, `false`이면 주말 선택 가능. `workday`는 생략 시 `true`, 나머지 유형은 `false` |
-| `data-dp-count-target` | 근무일 개수를 쓸 같은 폼 내 `input` 선택자 |
+| `data-dp-count-target` | 날짜 개수를 쓸 같은 폼 내 `input` 선택자 |
 | `data-dp-holidays` | 기존 마크업의 버튼별 공휴일 목록. 새 버튼은 `data-dp-holidays-add` 사용 |
 | `data-dp-holidays-add` | 기본 목록에 추가할 날짜 |
 | `data-dp-holidays-exclude` | 기본·추가 목록에서 공휴일 처리를 해제할 날짜 |

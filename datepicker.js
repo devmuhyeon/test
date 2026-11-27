@@ -9,19 +9,19 @@
     var active;
     var languages = {
         ko: {
-            day: '날짜 선택', month: '월 선택', multi: '다중 날짜 선택', workday: '근무일 선택',
+            day: '날짜 선택', month: '월 선택', multi: '다중 날짜 선택', workday: '날짜 선택',
             year: '연도', monthField: '월', prev: '이전', next: '다음',
             today: '오늘', thisMonth: '이번 달', close: '닫기', apply: '적용',
-            reset: '초기화', count: '선택한 일수', remove: '삭제',
+            reset: '초기화', count: '날짜 개수', remove: '삭제',
             days: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
             short: ['일', '월', '화', '수', '목', '금', '토'],
             months: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
         },
         en: {
-            day: 'Choose date', month: 'Choose month', multi: 'Choose dates', workday: 'Choose working days',
+            day: 'Choose date', month: 'Choose month', multi: 'Choose dates', workday: 'Choose dates',
             year: 'Year', monthField: 'Month', prev: 'Previous', next: 'Next',
             today: 'Today', thisMonth: 'This month', close: 'Close', apply: 'Apply',
-            reset: 'Reset', count: 'Selected days', remove: 'Remove',
+            reset: 'Reset', count: 'Selected dates', remove: 'Remove',
             days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
             short: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
             months: ['January', 'February', 'March', 'April', 'May', 'June',
