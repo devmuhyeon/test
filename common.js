@@ -1767,7 +1767,7 @@ function swiperActiveIndex(swiper) {
         var label = ($name.length ? $name : $trigger).text().replace(/\s+/g, ' ').trim();
         var $display = $trigger.prev('input[type="text"], input:not([type])');
         var generatedInput = !$display.length;
-        if (generatedInput) $display = $('<input type="text" readonly>').insertBefore($trigger);
+        if (generatedInput) $display = $('<input type="text">').insertBefore($trigger);
         label = label || $trigger.attr('title');
         if ($display.attr('title') && label) label = $display.attr('title') + ' ' + label;
 
@@ -1781,7 +1781,7 @@ function swiperActiveIndex(swiper) {
         var countTarget = $trigger.attr('data-dp-count-target');
         var disableWeekends = $trigger.attr('data-dp-disable-weekends');
         var displayName = $display.attr('name');
-        var name = $trigger.attr('data-dp-name') || displayName;
+        var name = displayName || $trigger.attr('data-dp-name');
         var initial = $trigger.attr('data-dp-value');
         if (initial === undefined) initial = $display.val();
         if (name && multi) {
@@ -1822,7 +1822,6 @@ function swiperActiveIndex(swiper) {
         $name.detach();
         $trigger.empty().addClass('btn_calendar w24dp-trigger').append($name);
         if (!$field.is('.box_ipt')) $display.addClass('w24dp-display');
-        if (multi) $display.prop('readOnly', true);
         if (!$display.attr('placeholder')) {
             $display.attr('placeholder', mode === 'month' ? 'YYYY-MM' : 'YYYY-MM-DD');
         }
@@ -1843,11 +1842,12 @@ function swiperActiveIndex(swiper) {
         } else {
             updateTriggerName(state);
         }
-        if (!state.multi) {
-            $display.on('input.work24Datepicker change.work24Datepicker', function () {
-                updateTriggerName(state);
-            });
-        }
+        $display.on('input.work24Datepicker change.work24Datepicker', function () {
+            if (state.multi) {
+                syncTypedDates(state);
+            }
+            updateTriggerName(state);
+        });
         return state;
     }
 
@@ -1856,10 +1856,38 @@ function swiperActiveIndex(swiper) {
         if (values.length > 1) {
             text += state.lang === 'ko' ? ' 외 ' + (values.length - 1) + '일' : ' + ' + (values.length - 1) + ' more';
         }
+        state.displaySummary = text;
         state.$display.val(text);
+        if (state.multi) state.$display[0].setCustomValidity('');
         updateTriggerName(state);
-        if (state.multi) state.$value.val(values.join(','));
+        if (state.multi) {
+            state.summaryValues = values.join(',');
+            state.$value.val(state.summaryValues);
+        }
         state.$countTarget.val(values.length);
+    }
+
+    function syncTypedDates(state) {
+        var text = state.$display.val().trim();
+        if (state.$display.val() === state.displaySummary) text = state.summaryValues;
+        var entries = text ? text.split(/\s*,\s*/) : [];
+        var values = $.grep(entries, function (entry) {
+            var date = parse(entry, false);
+            return date && canSelect(state, date);
+        });
+        var valid = values.length === entries.length;
+        var message = state.lang === 'ko' ?
+            '선택할 수 있는 날짜를 YYYY-MM-DD 형식으로 입력하고 쉼표로 구분해 주세요.' :
+            'Enter selectable dates in YYYY-MM-DD format, separated by commas.';
+        state.$display[0].setCustomValidity(valid ? '' : message);
+        var unique = valid ? $.grep(values, function (entry, index) {
+            return $.inArray(entry, values) === index;
+        }).sort() : [];
+        var value = unique.join(',');
+        if (state.$value.val() !== value) {
+            state.$value.val(value).trigger('change');
+            state.$countTarget.val(unique.length).trigger('change');
+        }
     }
 
     function updateTriggerName(state) {
@@ -2111,6 +2139,7 @@ function swiperActiveIndex(swiper) {
         var words = state.words;
         var now = new Date();
         state.today = new Date(now.getFullYear(), now.getMonth(), state.monthOnly ? 1 : now.getDate());
+        if (state.multi) syncTypedDates(state);
         var current = state.$value.val();
         var selected = parse(current, state.monthOnly);
         state.draft = state.multi ? (current ? current.split(',') : []) :

@@ -21,12 +21,11 @@
 </div>
 ```
 
-기존 입력란의 `id`, 직접 입력과 연결된 이벤트를 유지합니다. `single`·`month`는 기존 입력란의 `name`으로 값을 전송합니다. 기간 월 선택은 시작·종료 입력란에 각각 `w24-datepicker="month"` 버튼을 연결합니다. 기존 jQuery UI에 바인딩된 필드를 전환할 경우, 해당 필드는 기존 초기화 대상에서 빼고 새 버튼에만 `w24-datepicker`를 적용합니다.
+기존 입력란의 `id`, 직접 입력과 연결된 이벤트를 유지합니다. `single`·`month`는 기존 입력란의 `name`으로 값을 전송합니다. 기간 월 선택은 시작·종료 입력란에 각각 `w24-datepicker="month"`를, 기간 날짜 선택은 각각 `w24-datepicker="single"`을 지정합니다. 기존 jQuery UI에 바인딩된 필드를 전환할 경우, 해당 필드는 기존 초기화 대상에서 빼고 새 버튼에만 `w24-datepicker`를 적용합니다.
 
 | 속성 | 값 |
 | --- | --- |
 | `w24-datepicker` | `single` 단일 날짜, `multiple` 다중 날짜, `month` 월, `workday` 근무일 |
-| `data-dp-name` | 전송 필드 이름. `single`·`month`는 기존 입력의 `name`이 없을 때 이 값을 사용합니다. `multiple`·`workday`는 이 이름으로 hidden input을 만들며, 생략하면 기존 입력의 `name`을 사용합니다. `request.getParameter("visitDate")`로 읽을 수 있습니다. |
 | `data-dp-value` | 서버 초깃값. `2026-12-05`, `2026-12`, 또는 `2026-12-05,2026-12-12` |
 | `data-dp-locked-month` | 다중 선택을 지정 월에 고정할 때 `2026-12` |
 | `data-dp-lang` | 기본 `ko`, 영문 `en` |
@@ -35,16 +34,18 @@
 
 버튼 안의 `span.blind`에 `방문일`처럼 필드명을 넣으면 선택값과 함께 버튼의 `aria-label`을 자동 생성합니다. 버튼이 비어 있으면 유형별 기본 이름을 지정하고 `span.blind`를 생성합니다. `w24-datepicker`가 없는 기존 버튼에는 이 컴포넌트가 연결되지 않습니다.
 
+폼의 전송 이름은 `input`에 `name`으로 지정합니다. 다중 날짜와 근무일은 같은 이름의 hidden input에 날짜 목록을 저장합니다. 날짜를 직접 입력할 때 여러 건은 `YYYY-MM-DD` 형식의 날짜를 쉼표로 구분합니다.
+
 ## 주말과 공휴일 설정
 
 ```html
 <label for="work-dates">근무일</label>
 <div class="w24dp-field">
-    <input type="text" id="work-dates" readonly>
-    <button type="button" class="btn_calendar" w24-datepicker="workday" data-dp-name="workDates" data-dp-count-target="#workday-count" data-dp-holidays="2026-12-25" data-dp-holidays-add="2026-12-24,2026-12-31" data-dp-holidays-exclude="2026-12-24"><span class="blind">달력선택</span></button>
+    <input type="text" id="work-dates" name="workDates">
+    <button type="button" class="btn_calendar" w24-datepicker="workday" data-dp-count-target="#workday-count" data-dp-holidays="2026-12-25" data-dp-holidays-add="2026-12-24,2026-12-31" data-dp-holidays-exclude="2026-12-24"><span class="blind">달력선택</span></button>
 </div>
 <label for="workday-count">선택한 근무일 수</label>
-<input id="workday-count" name="workdayCount" type="text" readonly>
+<input id="workday-count" name="workdayCount" type="text">
 ```
 
 | 속성 | 값 |
