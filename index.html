@@ -23,44 +23,44 @@
         <h1>PC 공통 데이트피커</h1>
         <form class="datepicker-demo-list">
             <div class="datepicker-demo-item">
-                <h2 id="datepicker-title-1">단일 날짜 선택</h2>
+                <h2>단일 날짜 선택</h2>
                 <div class="box_table_group box_datepicker">
                     <div class="cell">
                         <span class="box_ipt">
-                            <input type="text" name="visitDate" class="input_txt" autocomplete="off" inputmode="numeric" aria-labelledby="datepicker-title-1">
+                            <input type="text" class="input_txt" placeholder="YYYY-MM-DD">
                             <button type="button" class="btn_calendar" w24-datepicker="single"><span class="blind">달력선택</span></button>
                         </span>
                     </div>
                 </div>
             </div>
             <div class="datepicker-demo-item">
-                <h2 id="datepicker-title-2">다중 날짜 선택 · 선택 월 고정</h2>
+                <h2>다중 날짜 선택 · 선택 월 고정</h2>
                 <div class="box_table_group box_datepicker">
                     <div class="cell">
                         <span class="box_ipt">
-                            <input type="text" class="input_txt" autocomplete="off" inputmode="numeric" aria-labelledby="datepicker-title-2" name="limitedDates">
+                            <input type="text" class="input_txt" placeholder="YYYY-MM-DD">
                             <button type="button" class="btn_calendar" w24-datepicker="multiple" data-dp-locked-month="2026-12" data-dp-value="2026-12-05,2026-12-08,2026-12-09,2026-12-12"><span class="blind">지정 월 내 날짜 선택</span></button>
                         </span>
                     </div>
                 </div>
             </div>
             <div class="datepicker-demo-item">
-                <h2 id="datepicker-title-3">다중 날짜 선택 · 기간 제한 없음</h2>
+                <h2>다중 날짜 선택 · 기간 제한 없음</h2>
                 <div class="box_table_group box_datepicker">
                     <div class="cell">
                         <span class="box_ipt">
-                            <input type="text" class="input_txt" autocomplete="off" inputmode="numeric" aria-labelledby="datepicker-title-3" name="visitDates">
+                            <input type="text" class="input_txt" placeholder="YYYY-MM-DD">
                             <button type="button" class="btn_calendar" w24-datepicker="multiple"><span class="blind">여러 날짜 선택</span></button>
                         </span>
                     </div>
                 </div>
             </div>
             <div class="datepicker-demo-item">
-                <h2 id="datepicker-title-4">근무일 선택 · 주말 제외, 공휴일 추가·제외</h2>
+                <h2>근무일 선택 · 주말 제외, 공휴일 추가·제외</h2>
                 <div class="box_table_group box_datepicker">
                     <div class="cell">
                         <span class="box_ipt">
-                            <input type="text" class="input_txt" autocomplete="off" inputmode="numeric" aria-labelledby="datepicker-title-4" name="workDates">
+                            <input type="text" class="input_txt" placeholder="YYYY-MM-DD" name="workDates">
                             <button type="button" class="btn_calendar" w24-datepicker="workday" data-dp-count-target="#workday-count" data-dp-holidays="2026-12-25" data-dp-holidays-add="2026-12-24,2026-12-31" data-dp-holidays-exclude="2026-12-24" data-dp-value="2026-12-29"><span class="blind">근무일 선택</span></button>
                         </span>
                     </div>
@@ -69,11 +69,11 @@
                 <input id="workday-count" type="text" class="input_txt" name="workdayCount">
             </div>
             <div class="datepicker-demo-item">
-                <h2 id="datepicker-title-5">월 선택 · 1950~2050년</h2>
+                <h2>월 선택 · 1950~2050년</h2>
                 <div class="box_table_group box_datepicker">
                     <div class="cell">
                         <span class="box_ipt">
-                            <input type="text" name="visitMonth" class="input_txt" autocomplete="off" inputmode="numeric" aria-labelledby="datepicker-title-5">
+                            <input type="text" class="input_txt" placeholder="YYYY-MM">
                             <button type="button" class="btn_calendar" w24-datepicker="month" data-dp-min-year="1950" data-dp-max-year="2050"><span class="blind">월 선택</span></button>
                         </span>
                     </div>
@@ -84,14 +84,14 @@
                 <div class="box_table_group box_datepicker flx-dir-col">
                     <div class="cell">
                         <span class="box_ipt">
-                            <input type="text" class="input_txt" id="startSchoolList_0" name="startSchoolList" title="재학기간 시작날짜" placeholder="YYYY-MM" autocomplete="off" inputmode="numeric">
+                            <input type="text" class="input_txt" name="startSchoolList" title="재학기간 시작날짜" placeholder="YYYY-MM">
                             <button type="button" class="btn_calendar" w24-datepicker="month"><span class="blind">달력선택</span></button>
                         </span>
                     </div>
                     <div class="cell flx-dir-row" style="flex-direction: row;">
                         <i class="date_line b1_r" aria-hidden="true">~</i>
                         <span class="box_ipt">
-                            <input type="text" class="input_txt" id="endSchoolList_0" name="endSchoolList" title="재학기간 종료날짜" placeholder="YYYY-MM" autocomplete="off" inputmode="numeric">
+                            <input type="text" class="input_txt" name="endSchoolList" title="재학기간 종료날짜" placeholder="YYYY-MM">
                             <button type="button" class="btn_calendar" w24-datepicker="month"><span class="blind">달력선택</span></button>
                         </span>
                     </div>
@@ -102,25 +102,25 @@
                 <div class="box_table_group box_datepicker flx-dir-col">
                     <div class="cell">
                         <span class="box_ipt">
-                            <input type="text" class="input_txt" id="startDateList_0" name="startDateList" title="기간 시작날짜" placeholder="YYYY-MM-DD" autocomplete="off" inputmode="numeric">
+                            <input type="text" class="input_txt" name="startDateList" title="기간 시작날짜" placeholder="YYYY-MM-DD">
                             <button type="button" class="btn_calendar" w24-datepicker="single"><span class="blind">달력선택</span></button>
                         </span>
                     </div>
                     <div class="cell flx-dir-row" style="flex-direction: row;">
                         <i class="date_line b1_r" aria-hidden="true">~</i>
                         <span class="box_ipt">
-                            <input type="text" class="input_txt" id="endDateList_0" name="endDateList" title="기간 종료날짜" placeholder="YYYY-MM-DD" autocomplete="off" inputmode="numeric">
+                            <input type="text" class="input_txt" name="endDateList" title="기간 종료날짜" placeholder="YYYY-MM-DD">
                             <button type="button" class="btn_calendar" w24-datepicker="single"><span class="blind">달력선택</span></button>
                         </span>
                     </div>
                 </div>
             </div>
             <div class="datepicker-demo-item">
-                <h2 lang="en" id="datepicker-title-6">English example</h2>
+                <h2 lang="en">English example</h2>
                 <div class="box_table_group box_datepicker">
                     <div class="cell">
                         <span class="box_ipt">
-                            <input type="text" name="englishDate" class="input_txt" autocomplete="off" inputmode="numeric" aria-labelledby="datepicker-title-6">
+                            <input type="text" class="input_txt" placeholder="YYYY-MM-DD">
                             <button type="button" class="btn_calendar" w24-datepicker="single" data-dp-lang="en"><span class="blind">Choose date</span></button>
                         </span>
                     </div>

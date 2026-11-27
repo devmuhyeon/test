@@ -137,7 +137,7 @@
         var label = ($name.length ? $name : $trigger).text().replace(/\s+/g, ' ').trim();
         var $display = $trigger.prev('input[type="text"], input:not([type])');
         var generatedInput = !$display.length;
-        if (generatedInput) $display = $('<input type="text">').insertBefore($trigger);
+        if (generatedInput) $display = $('<input type="text" class="input_txt">').insertBefore($trigger);
         label = label || $trigger.attr('title');
         if ($display.attr('title') && label) label = $display.attr('title') + ' ' + label;
 

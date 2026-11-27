@@ -14,14 +14,14 @@
 <div class="box_table_group box_datepicker">
     <div class="cell">
         <span class="box_ipt">
-            <input type="text" class="input_txt" id="testDtList_0" name="testDtList" title="응시일" placeholder="YYYY-MM-DD" autocomplete="off" inputmode="numeric">
+            <input type="text" class="input_txt" placeholder="YYYY-MM-DD">
             <button type="button" class="btn_calendar" w24-datepicker="single"><span class="blind">달력선택</span></button>
         </span>
     </div>
 </div>
 ```
 
-기존 입력란의 `id`, 직접 입력과 연결된 이벤트를 유지합니다. `single`·`month`는 기존 입력란의 `name`으로 값을 전송합니다. 기간 월 선택은 시작·종료 입력란에 각각 `w24-datepicker="month"`를, 기간 날짜 선택은 각각 `w24-datepicker="single"`을 지정합니다. 기존 jQuery UI에 바인딩된 필드를 전환할 경우, 해당 필드는 기존 초기화 대상에서 빼고 새 버튼에만 `w24-datepicker`를 적용합니다.
+위 기본 입력란만으로 동작합니다. 폼 전송이 필요할 때 `name`을 지정합니다. 연결된 `label`, `aria-label`, `aria-labelledby`, `title`이 있으면 사용하며, 모두 없으면 달력 버튼의 이름으로 입력란에 `aria-label`을 생성합니다. 기존 입력란의 `id`, 직접 입력과 연결된 이벤트를 유지합니다. `single`·`month`는 기존 입력란의 `name`으로 값을 전송합니다. 기간 월 선택은 시작·종료 입력란에 각각 `w24-datepicker="month"`를, 기간 날짜 선택은 각각 `w24-datepicker="single"`을 지정합니다. 기존 jQuery UI에 바인딩된 필드를 전환할 경우, 해당 필드는 기존 초기화 대상에서 빼고 새 버튼에만 `w24-datepicker`를 적용합니다.
 
 | 속성 | 값 |
 | --- | --- |
