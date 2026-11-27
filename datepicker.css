@@ -150,6 +150,7 @@ button.w24dp-trigger:focus,
 .w24dp-dialog select:focus,
 .w24dp-dialog [data-dp-date]:focus { position: relative; z-index: 1; outline: 2px solid #1d308c; outline-offset: 1px; }
 .w24dp-dialog [data-dp-date]:focus .w24dp-date { box-shadow: inset 0 0 0 2px #fff; }
+button.w24dp-trigger > .blind,
 .w24dp-dialog .w24dp-sr {
     position: absolute;
     width: 1px;

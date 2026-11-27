@@ -82,6 +82,8 @@
         if (state) return state;
 
         var lang = $trigger.attr('data-dp-lang') === 'en' ? 'en' : 'ko';
+        var $name = $trigger.children('.blind').first();
+        var label = ($name.length ? $name : $trigger).text().replace(/\s+/g, ' ').trim();
         var $value = $('<input type="hidden">');
         var name = $trigger.attr('data-dp-name');
         if (name) $value.attr('name', name).insertAfter($trigger);
@@ -93,7 +95,7 @@
             locked: mode === 'multi' ? parse($trigger.attr('data-dp-locked-month'), true) : null,
             disableWeekends: $trigger.attr('data-dp-disable-weekends') === 'true',
             holidays: {},
-            label: $trigger.text().replace(/\s+/g, ' ').trim() || languages[lang][mode]
+            label: label || languages[lang][mode]
         };
 
         $.each(dateList($trigger, 'data-dp-holidays').concat(dateList($trigger, 'data-dp-holidays-add')), function (_, value) {
@@ -112,7 +114,9 @@
             'aria-haspopup': 'dialog', 'aria-expanded': 'false', lang: lang
         });
 
-        state.$text = $('<span>').appendTo($trigger.empty().addClass('w24dp-trigger'));
+        $name.detach();
+        $trigger.empty().addClass('w24dp-trigger').append($name);
+        state.$text = $('<span>').appendTo($trigger);
         state.$icon = $('<span class="w24dp-icon" aria-hidden="true">').appendTo($trigger);
         var initial = $trigger.attr('data-dp-value') || '';
         var initialValues = initial.split(',');

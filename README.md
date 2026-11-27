@@ -9,7 +9,7 @@
 3. JSP에 아래 버튼을 한 줄 넣습니다. jQuery UI 달력과 함께 사용하는 화면에서는 각각의 마크업을 사용합니다.
 
 ```html
-<button type="button" w24-datepicker="day" data-dp-name="visitDate">방문일</button>
+<button type="button" w24-datepicker="day" data-dp-name="visitDate"><span class="blind">방문일</span></button>
 ```
 
 | 속성 | 값 |
@@ -22,12 +22,12 @@
 
 선택값은 각각 `YYYY-MM-DD`, `YYYY-MM`, 날짜 목록을 쉼표로 연결한 문자열입니다. 다중 선택은 **적용**에서 저장하며 빈 목록도 적용할 수 있습니다. 저장값이 바뀌면 hidden input의 `change`와 버튼의 `work24datepicker:change` 이벤트가 발생합니다. 버튼 이벤트의 두 번째 인수는 단일 날짜·월 모드에서 문자열이고 다중 모드에서 날짜 배열입니다. 기본 연도 범위는 1900~2100입니다.
 
-버튼 본문에 `방문일`처럼 필드명을 넣으면 선택값과 함께 버튼의 접근 가능한 이름으로 자동 사용합니다. 본문이 비어 있으면 달력 유형에 맞는 기본 이름을 사용합니다.
+버튼 안의 `span.blind`에 `방문일`처럼 필드명을 넣으면 선택값과 함께 버튼의 `aria-label`을 자동 생성합니다. 버튼명이 비어 있으면 달력 유형에 맞는 기본 이름을 사용합니다.
 
 ## 주말과 공휴일 설정
 
 ```html
-<button type="button" w24-datepicker="day" data-dp-name="workDate" data-dp-disable-weekends="true" data-dp-holidays="2026-12-25" data-dp-holidays-add="2026-12-24,2026-12-31" data-dp-holidays-exclude="2026-12-24">근무일 선택</button>
+<button type="button" w24-datepicker="day" data-dp-name="workDate" data-dp-disable-weekends="true" data-dp-holidays="2026-12-25" data-dp-holidays-add="2026-12-24,2026-12-31" data-dp-holidays-exclude="2026-12-24"><span class="blind">근무일 선택</span></button>
 ```
 
 | 속성 | 값 |
