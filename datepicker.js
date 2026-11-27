@@ -74,7 +74,7 @@
     function canSelect(state, date) {
         if (date < state.min || date > state.max) return false;
         if (state.fixedMonth !== null && state.fixedMonth !== undefined && date.getMonth() !== state.fixedMonth) return false;
-        if (state.monthOnly) return true;
+        if (state.monthOnly || (state.popup && !state.disableWeekends)) return true;
         var weekday = date.getDay();
         if (state.disableWeekends && (weekday === 0 || weekday === 6)) return false;
         return !state.holidays[format(date, false)];
@@ -179,6 +179,7 @@
             min: new Date(years.min || 1000, 0, 1), max: new Date(years.max || 9999, 11, 31),
             fixedYear: fixedYear, fixedMonth: fixedMonth,
             disableWeekends: disableWeekends === undefined ? workday : disableWeekends === 'true',
+            popup: multi && $trigger.attr('data-dp-presentation') === 'popup',
             holidays: buildHolidays($trigger),
             label: label || languages[lang][mode]
         };
@@ -281,6 +282,7 @@
     }
 
     function position(state) {
+        if (state.popup) return;
         var rect = state.$field[0].getBoundingClientRect();
         var width = state.$dialog.outerWidth();
         var height = state.$dialog.outerHeight();
@@ -359,7 +361,7 @@
             var selected = enabled && $.inArray(key, state.draft) !== -1;
             var label = describe(state, item);
             var $item = $('<span class="w24dp_date">')
-                .text(state.monthOnly ? (state.lang === 'ko' ? words.months[i] : words.months[i].slice(0, 3)) : item.getDate())
+                .text(state.monthOnly ? (state.lang === 'ko' ? words.months[i] : words.months[i].slice(0, 3)) : (state.popup ? pad(item.getDate()) : item.getDate()))
                 .appendTo($cell);
 
             $cell.attr('aria-label', label);
@@ -386,7 +388,7 @@
 
     function renderSelection(state) {
         if (!state.multi) return;
-        state.$count.text(state.draft.length + (state.lang === 'ko' ? '일' : ''));
+        state.$count.text((state.popup && state.lang === 'ko' ? '총 ' : '') + state.draft.length + (state.lang === 'ko' ? '일' : ''));
         state.$list.empty();
         $.each(state.draft, function (_, value) {
             var label = state.lang === 'ko' ? value + ' ' + state.words.remove : state.words.remove + ' ' + value;
@@ -401,6 +403,10 @@
         active = null;
         $(window).off('.work24Datepicker');
         state.$layer.remove();
+        if (state.popup) {
+            state.$background.removeAttr('inert');
+            if (!commit) state.disableWeekends = state.originalRestriction;
+        }
         state.$trigger.attr('aria-expanded', 'false').removeAttr('aria-controls');
         if (restoreFocus !== false) state.$trigger[0].focus();
         if (commit && previous !== state.$value.val()) {
@@ -473,8 +479,9 @@
             event.stopPropagation();
             close(state, false);
         } else if (code === 9) {
-            var $stops = state.$trigger.add(state.$dialog.find('button, select, [tabindex="0"]'))
-                .filter(':visible:not(:disabled)');
+            var $stops = state.$dialog.find('button, select, input, [tabindex="0"]');
+            if (!state.popup) $stops = state.$trigger.add($stops);
+            $stops = $stops.filter(':visible:not(:disabled)');
             var index = $stops.index(document.activeElement);
             var next = index < 0 ? (event.shiftKey ? $stops.length - 1 : 0) :
                 (index + (event.shiftKey ? -1 : 1) + $stops.length) % $stops.length;
@@ -495,6 +502,13 @@
         }).on('click', '[data-dp-date]', function () {
             state.cursor = parse($(this).attr('data-dp-date'), state.monthOnly);
             select(state, $(this).attr('data-dp-date'));
+        }).on('change', '[data-dp-restriction]', function () {
+            state.disableWeekends = this.checked;
+            state.draft = $.grep(state.draft, function (key) {
+                return canSelect(state, parse(key, false));
+            });
+            render(state, false);
+            renderSelection(state);
         }).on('change', 'select', function () {
             var month = state.monthOnly ? state.cursor.getMonth() : +state.$month.val();
             var amount = (+state.$year.val() - state.cursor.getFullYear()) * 12 + month - state.cursor.getMonth();
@@ -528,6 +542,7 @@
         var now = new Date();
         state.today = new Date(now.getFullYear(), now.getMonth(), state.monthOnly ? 1 : now.getDate());
         if (state.multi) syncTypedDates(state);
+        state.originalRestriction = state.disableWeekends;
         var current = state.$value.val();
         var selected = parse(current, state.monthOnly);
         state.draft = state.multi ? (current ? current.split(',') : []) :
@@ -541,10 +556,29 @@
         var id = 'w24dp_dialog';
         while (document.getElementById(id) || document.getElementById(id + '_heading')) id += '_1';
         state.$layer = $('<div class="w24dp_layer">').appendTo('body');
-        state.$dialog = $('<div class="w24dp_dialog" role="dialog">')
+        state.$dialog = $(state.popup ?
+            '<section class="full_pop large w24dp_dialog w24dp_popup" role="dialog" aria-modal="true">' :
+            '<div class="w24dp_dialog" role="dialog">')
             .attr({ id: id, lang: state.lang, 'aria-label': state.label })
             .toggleClass('w24dp_month_dialog', state.monthOnly).appendTo(state.$layer);
-        var $main = $('<div class="w24dp_main">').appendTo(state.$dialog);
+        var $content = state.$dialog;
+        if (state.popup) {
+            state.$layer.addClass('w24dp_popup_layer');
+            var $head = $('<div class="head">').appendTo(state.$dialog);
+            $('<h1 class="h2_sb">').attr('id', id + '_title')
+                .text(state.lang === 'ko' ? '근무일 선택' : 'Select workdays').appendTo($head);
+            state.$dialog.removeAttr('aria-label').attr('aria-labelledby', id + '_title');
+            button('×', 'close', words.close).addClass('closed w24dp_popup_close').appendTo(state.$dialog);
+            $content = $('<div class="cont">').appendTo(state.$dialog);
+            var $toolbar = $('<div class="w24dp_popup_toolbar">').appendTo($content);
+            var $legend = $('<div class="w24dp_legend">').appendTo($toolbar);
+            $('<span class="w24dp_legend_available">').text(state.lang === 'ko' ? '선택 가능일' : 'Available').appendTo($legend);
+            $('<span class="w24dp_legend_disabled">').text(state.lang === 'ko' ? '선택 불가능일' : 'Unavailable').appendTo($legend);
+            var $label = $('<label class="w24dp_restriction">')
+                .text(state.lang === 'ko' ? '주말 및 공휴일 선택 제한' : 'Exclude weekends and holidays').appendTo($toolbar);
+            $('<input type="checkbox" data-dp-restriction>').prop('checked', state.disableWeekends).appendTo($label);
+        }
+        var $main = $('<div class="w24dp_main">').appendTo($content);
         var $header = $('<div class="w24dp_header">').appendTo($main);
         var moveByYear = state.monthOnly || state.fixedMonth !== null;
         var unit = moveByYear ? words.year : words.monthField;
@@ -558,7 +592,10 @@
         if (!hideNavigation) state.$prev.appendTo($header);
         if (state.fixedYear) {
             var yearLabel = String(state.fixedYear) + (state.lang === 'ko' ? '년' : '');
-            if (state.fixedMonth !== null) yearLabel += ' ' + words.months[state.fixedMonth];
+            if (state.fixedMonth !== null) {
+                yearLabel = state.popup ? state.fixedYear + '. ' + pad(state.fixedMonth + 1) :
+                    yearLabel + ' ' + words.months[state.fixedMonth];
+            }
             $('<span>').text(yearLabel).appendTo($header);
         } else {
             state.$year.appendTo($header);
@@ -584,22 +621,32 @@
             });
         }
         state.$body = $('<tbody>').appendTo($grid);
-        var $footer = $('<div class="w24dp_footer">').appendTo($main);
-        state.$today = button(state.monthOnly ? words.thisMonth : words.today, 'today').appendTo($footer);
-        $('<span>').text(format(state.today, state.monthOnly)).appendTo($footer);
-        button(words.close, 'close').appendTo($footer);
+        state.$today = button(state.monthOnly ? words.thisMonth : words.today, 'today');
+        if (!state.popup) {
+            var $footer = $('<div class="w24dp_footer">').appendTo($main);
+            state.$today.appendTo($footer);
+            $('<span>').text(format(state.today, state.monthOnly)).appendTo($footer);
+            button(words.close, 'close').appendTo($footer);
+        }
 
         if (state.multi) {
-            var $side = $('<div class="w24dp_side">').appendTo(state.$dialog);
-            var $summary = $('<div class="w24dp_summary" aria-live="polite" aria-atomic="true">').text(words.count).appendTo($side);
+            var $side = $('<div class="w24dp_side">').appendTo($content);
+            var countLabel = state.popup && state.lang === 'ko' ? '선택한 근무일' : words.count;
+            var $summary = $('<div class="w24dp_summary" aria-live="polite" aria-atomic="true">').text(countLabel).appendTo($side);
             state.$count = $('<strong>').appendTo($summary);
-            state.$list = $('<ul class="w24dp_list">').attr('aria-label', words.count).appendTo($side);
-            var $actions = $('<div class="w24dp_footer">').appendTo($side);
-            state.$reset = button(words.reset, 'reset').prepend($('<span aria-hidden="true">').text('⟲ ')).appendTo($actions);
-            button(words.apply, 'apply').appendTo($actions);
+            state.$list = $('<ul class="w24dp_list">').attr('aria-label', countLabel).appendTo($side);
+            var $actions = state.popup ?
+                $('<div class="box_btn_wrap flex_al_r w24dp_popup_actions">').appendTo($content) :
+                $('<div class="w24dp_footer">').appendTo($side);
+            state.$reset = button(words.reset, 'reset').prepend($('<span aria-hidden="true">').text('⟲ '))
+                .appendTo(state.popup ? $summary : $actions);
+            if (state.popup) button(words.close, 'close').addClass('btn big type01 closed').appendTo($actions);
+            var $apply = button(words.apply, 'apply').appendTo($actions);
+            if (state.popup) $apply.addClass('btn big type01 fill');
         }
 
         active = state;
+        if (state.popup) state.$background = state.$layer.siblings().not('[inert], script, style, link').attr('inert', '');
         bind(state);
         renderSelection(state);
         state.$trigger.attr({ 'aria-expanded': 'true', 'aria-controls': id });

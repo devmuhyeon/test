@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>고용24 PC 공통 데이트피커</title>
-    <link rel="stylesheet" href="common.css?v=calendar-states">
+    <link rel="stylesheet" href="common.css?v=workday-popup">
     <link rel="stylesheet" href="layout.css">
     <link rel="stylesheet" href="jquery-ui.css">
     <style>
@@ -16,7 +16,7 @@
         .datepicker_page_item > #w24dp_date_count { width: 80px; padding: 4px 8px; }
     </style>
     <script src="jquery-3.6.1.min.js" defer></script>
-    <script src="common.js?v=current-month-only" defer></script>
+    <script src="common.js?v=workday-popup" defer></script>
 </head>
 <body>
     <main class="datepicker_page">
@@ -67,6 +67,19 @@
                 </div>
                 <label for="w24dp_date_count">날짜 개수</label>
                 <input id="w24dp_date_count" type="text" class="input_txt" name="workdayCount">
+            </div>
+            <div class="datepicker_page_item" data-dp-scope>
+                <h2>근무일 선택 · 팝업</h2>
+                <div class="box_table_group box_datepicker">
+                    <div class="cell">
+                        <span class="box_ipt">
+                            <input type="text" class="input_txt" placeholder="YYYY-MM-DD" name="popupWorkDates">
+                            <button type="button" class="btn_calendar" w24-datepicker="workday" data-dp-presentation="popup" data-dp-locked-month="2026-10" data-dp-holidays-add="2026-10-05,2026-10-09" data-dp-count-target="#w24dp_popup_date_count"><span class="blind">근무일 선택</span></button>
+                        </span>
+                    </div>
+                </div>
+                <label for="w24dp_popup_date_count">날짜 개수</label>
+                <input id="w24dp_popup_date_count" type="text" class="input_txt" name="popupWorkdayCount">
             </div>
             <div class="datepicker_page_item">
                 <h2>월 선택</h2>
