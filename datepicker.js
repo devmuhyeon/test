@@ -72,6 +72,17 @@
         return null;
     }
 
+    function configuredYear($trigger, attribute, fallback) {
+        var value = $trigger.closest('[' + attribute + ']').attr(attribute);
+        return /^[1-9]\d{3}$/.test(value) ? Number(value) : fallback;
+    }
+
+    function yearBounds($trigger) {
+        var min = configuredYear($trigger, 'data-dp-min-year', 1900);
+        var max = configuredYear($trigger, 'data-dp-max-year', 2100);
+        return min <= max ? { min: min, max: max } : { min: 1900, max: 2100 };
+    }
+
     function setup(element) {
         var $trigger = $(element);
         var mode = $trigger.attr('w24-datepicker');
@@ -113,11 +124,12 @@
             $display.attr('name', name);
         }
 
+        var years = yearBounds($trigger);
         state = {
             $trigger: $trigger, $display: $display, $field: $field, $value: $value, mode: mode, lang: lang, words: languages[lang],
             monthOnly: mode === 'month', multi: multi,
             $countTarget: workday && countTarget ? $trigger.closest('form').find(countTarget).filter('input') : $(),
-            min: new Date(1900, 0, 1), max: new Date(2100, 11, 31),
+            min: new Date(years.min, 0, 1), max: new Date(years.max, 11, 31),
             locked: multi ? parse($trigger.attr('data-dp-locked-month'), true) : null,
             disableWeekends: disableWeekends === undefined ? workday : disableWeekends === 'true',
             holidays: {},

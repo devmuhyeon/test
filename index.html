@@ -21,7 +21,7 @@
 <body>
     <main class="datepicker-demo">
         <h1>PC 공통 데이트피커</h1>
-        <form class="datepicker-demo-list">
+        <form class="datepicker-demo-list" data-dp-min-year="1900" data-dp-max-year="2100">
             <div class="datepicker-demo-item">
                 <h2 id="datepicker-title-1">단일 날짜 선택</h2>
                 <div class="box_table_group box_datepicker">
@@ -69,12 +69,12 @@
                 <input id="workday-count" type="text" class="input_txt" name="workdayCount">
             </div>
             <div class="datepicker-demo-item">
-                <h2 id="datepicker-title-5">월 선택</h2>
+                <h2 id="datepicker-title-5">월 선택 · 1950~2050년</h2>
                 <div class="box_table_group box_datepicker">
                     <div class="cell">
                         <span class="box_ipt">
                             <input type="text" name="visitMonth" class="input_txt" autocomplete="off" inputmode="numeric" aria-labelledby="datepicker-title-5">
-                            <button type="button" class="btn_calendar" w24-datepicker="month"><span class="blind">월 선택</span></button>
+                            <button type="button" class="btn_calendar" w24-datepicker="month" data-dp-min-year="1950" data-dp-max-year="2050"><span class="blind">월 선택</span></button>
                         </span>
                     </div>
                 </div>
