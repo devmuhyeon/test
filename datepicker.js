@@ -136,7 +136,11 @@
             label: label || languages[lang][mode]
         };
 
-        $.each(dateList($trigger, 'data-dp-holidays').concat(dateList($trigger, 'data-dp-holidays-add')), function (_, value) {
+        var holidays = dateList($trigger, 'data-dp-holidays');
+        $trigger.parents('[data-dp-holidays-add]').addBack().each(function () {
+            holidays = holidays.concat(dateList($(this), 'data-dp-holidays-add'));
+        });
+        $.each(holidays, function (_, value) {
             state.holidays[value] = true;
         });
         $.each(dateList($trigger, 'data-dp-holidays-exclude'), function (_, value) {
