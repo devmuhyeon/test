@@ -13,7 +13,7 @@
         .datepicker_demo_item { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
         .datepicker_demo_item h2 { margin: 0; font-size: 16px; line-height: 1.5; }
         .datepicker_demo_item > .box_datepicker { width: 360px; max-width: 100%; }
-        .datepicker_demo_item > #w24dp_demo_date_count_01 { width: 80px; padding: 4px 8px; }
+        .datepicker_demo_item > #w24dp_date_count { width: 80px; padding: 4px 8px; }
     </style>
     <script src="jquery-3.6.1.min.js" defer></script>
     <script src="common.js" defer></script>
@@ -61,12 +61,12 @@
                     <div class="cell">
                         <span class="box_ipt">
                             <input type="text" class="input_txt" placeholder="YYYY-MM-DD" name="workDates">
-                            <button type="button" class="btn_calendar" w24-datepicker="workday" data-dp-count-target="#w24dp_demo_date_count_01" data-dp-holidays="2026-12-25" data-dp-holidays-add="2026-12-24,2026-12-31" data-dp-holidays-exclude="2026-12-24" data-dp-value="2026-12-29"><span class="blind">날짜 선택</span></button>
+                            <button type="button" class="btn_calendar" w24-datepicker="workday" data-dp-count-target="#w24dp_date_count" data-dp-holidays="2026-12-25" data-dp-holidays-add="2026-12-24,2026-12-31" data-dp-holidays-exclude="2026-12-24" data-dp-value="2026-12-29"><span class="blind">날짜 선택</span></button>
                         </span>
                     </div>
                 </div>
-                <label for="w24dp_demo_date_count_01">날짜 개수</label>
-                <input id="w24dp_demo_date_count_01" type="text" class="input_txt" name="workdayCount">
+                <label for="w24dp_date_count">날짜 개수</label>
+                <input id="w24dp_date_count" type="text" class="input_txt" name="workdayCount">
             </div>
             <div class="datepicker_demo_item">
                 <h2>월 선택 · 1950~2050년</h2>

@@ -2018,8 +2018,9 @@ function swiperActiveIndex(swiper) {
             var item = state.monthOnly ? new Date(year, i, 1) : new Date(year, month, i - start + 1);
             var key = format(item, state.monthOnly);
             var inPeriod = state.monthOnly || item.getMonth() === month;
-            var selected = inPeriod && $.inArray(key, state.draft) !== -1;
-            var enabled = inPeriod && canSelect(state, item);
+            var nextPeriod = !inPeriod && item > date && !state.locked;
+            var enabled = (inPeriod || nextPeriod) && canSelect(state, item);
+            var selected = enabled && $.inArray(key, state.draft) !== -1;
             var label = describe(state, item);
             var $cell = $('<td>').appendTo($row);
 
@@ -2034,10 +2035,11 @@ function swiperActiveIndex(swiper) {
                 continue;
             }
 
+            $cell.toggleClass('w24dp_other_month', nextPeriod);
             var focused = key === format(date, state.monthOnly);
             $cell.attr({ 'data-dp-date': key, tabindex: focused ? '0' : '-1', 'aria-selected': String(selected) });
             if (key === current) $cell.attr('aria-current', state.monthOnly ? 'true' : 'date');
-            if (!state.monthOnly && selected) {
+            if (!state.monthOnly && inPeriod && selected) {
                 var prev = format(new Date(year, month, item.getDate() - 1), false);
                 var next = format(new Date(year, month, item.getDate() + 1), false);
                 $cell.toggleClass('w24dp_joined_prev', i % columns !== 0 && item.getDate() > 1 && $.inArray(prev, state.draft) !== -1);

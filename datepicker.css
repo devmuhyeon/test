@@ -151,6 +151,7 @@
 .w24dp_dialog .w24dp_month_grid { padding: 4px 5px 5px; border-spacing: 4px; }
 .w24dp_month_grid .w24dp_date { height: 40px; line-height: 38px; }
 .w24dp_grid [data-dp-date] { cursor: pointer; }
+.w24dp_grid .w24dp_other_month .w24dp_date { border-color: #909090; color: #626262; }
 .w24dp_grid:not(.w24dp_month_grid) [data-dp-date]:hover .w24dp_date { background: #f0f0f0; }
 .w24dp_grid [aria-disabled="true"] .w24dp_date,
 .w24dp_dialog button:disabled { border-color: #d6d6d6; color: #767676; cursor: default; }

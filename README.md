@@ -56,10 +56,10 @@ var commonHolidays = ['2026-12-30', '2026-12-31'];
 <label for="work-dates">날짜</label>
 <div class="w24dp_field">
     <input type="text" id="work-dates" name="workDates">
-    <button type="button" class="btn_calendar" w24-datepicker="workday" data-dp-count-target="#w24dp_demo_date_count_01" data-dp-holidays="2026-12-25" data-dp-holidays-add="2026-12-24,2026-12-31" data-dp-holidays-exclude="2026-12-24"><span class="blind">달력선택</span></button>
+    <button type="button" class="btn_calendar" w24-datepicker="workday" data-dp-count-target="#w24dp_date_count" data-dp-holidays="2026-12-25" data-dp-holidays-add="2026-12-24,2026-12-31" data-dp-holidays-exclude="2026-12-24"><span class="blind">달력선택</span></button>
 </div>
-<label for="w24dp_demo_date_count_01">날짜 개수</label>
-<input id="w24dp_demo_date_count_01" name="workdayCount" type="text">
+<label for="w24dp_date_count">날짜 개수</label>
+<input id="w24dp_date_count" name="workdayCount" type="text">
 ```
 
 | 속성 | 값 |
@@ -71,6 +71,8 @@ var commonHolidays = ['2026-12-30', '2026-12-31'];
 | `data-dp-holidays-exclude` | 기본·추가 목록에서 공휴일 처리를 해제할 날짜 |
 
 날짜는 `YYYY-MM-DD`로 지정하고 여러 날짜는 쉼표로 구분합니다. 공휴일 제외가 기본·추가 공휴일보다 우선합니다. 주말 비활성화가 켜져 있으면 공휴일 목록에서 제외한 토·일도 선택할 수 없습니다. 일 단위인 `single`, `multiple`, `workday`에 적용됩니다. 근무일은 여러 날짜를 선택한 뒤 적용하면 지정한 입력란에 일수가 반영됩니다. 공통으로 반영할 국가 공휴일도 `commonHolidays`에 등록합니다.
+
+현재 달력 하단에 나타나는 다음 달 날짜도 선택할 수 있습니다. 다중 선택에서는 다음 달로 이동하고 선택 목록에 반영됩니다. 월 고정과 날짜 제한도 적용됩니다.
 
 ## 키보드
 
