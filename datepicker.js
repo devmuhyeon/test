@@ -240,7 +240,7 @@
             var focused = key === format(date, state.monthOnly);
             $cell.attr({ 'data-dp-date': key, tabindex: focused ? '0' : '-1', 'aria-selected': String(selected) });
             if (key === current) $cell.attr('aria-current', state.monthOnly ? 'true' : 'date');
-            if (state.multi && selected && !state.locked) {
+            if (!state.monthOnly && selected) {
                 var prev = format(new Date(year, month, item.getDate() - 1), false);
                 var next = format(new Date(year, month, item.getDate() + 1), false);
                 $cell.toggleClass('w24dp-joined-prev', i % columns !== 0 && item.getDate() > 1 && $.inArray(prev, state.draft) !== -1);
