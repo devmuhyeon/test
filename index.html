@@ -8,21 +8,21 @@
     <link rel="stylesheet" href="layout.css">
     <link rel="stylesheet" href="jquery-ui.css">
     <style>
-        .datepicker_demo { max-width: 720px; margin: 48px auto; padding: 0 16px; }
-        .datepicker_demo_list { display: flex; flex-direction: column; gap: 28px; margin-top: 24px; }
-        .datepicker_demo_item { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
-        .datepicker_demo_item h2 { margin: 0; font-size: 16px; line-height: 1.5; }
-        .datepicker_demo_item > .box_datepicker { width: 360px; max-width: 100%; }
-        .datepicker_demo_item > #w24dp_date_count { width: 80px; padding: 4px 8px; }
+        .datepicker_page { max-width: 720px; margin: 48px auto; padding: 0 16px; }
+        .datepicker_page_list { display: flex; flex-direction: column; gap: 28px; margin-top: 24px; }
+        .datepicker_page_item { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+        .datepicker_page_item h2 { margin: 0; font-size: 16px; line-height: 1.5; }
+        .datepicker_page_item > .box_datepicker { width: 360px; max-width: 100%; }
+        .datepicker_page_item > #w24dp_date_count { width: 80px; padding: 4px 8px; }
     </style>
     <script src="jquery-3.6.1.min.js" defer></script>
     <script src="common.js?v=current-month-only" defer></script>
 </head>
 <body>
-    <main class="datepicker_demo">
-        <h1>PC 공통 데이트피커</h1>
-        <form class="datepicker_demo_list">
-            <div class="datepicker_demo_item">
+    <main class="datepicker_page">
+        <h1>고용24 공통 데이트피커</h1>
+        <form class="datepicker_page_list">
+            <div class="datepicker_page_item">
                 <h2>단일 날짜 선택</h2>
                 <div class="box_table_group box_datepicker">
                     <div class="cell">
@@ -33,9 +33,8 @@
                     </div>
                 </div>
             </div>
-            <div class="datepicker_demo_item">
+            <div class="datepicker_page_item">
                 <h2>다중 날짜 선택 · 선택 월 고정</h2>
-                <p>선택값 표시 예시 2026-12-05 외 3일</p>
                 <div class="box_table_group box_datepicker">
                     <div class="cell">
                         <span class="box_ipt">
@@ -45,7 +44,7 @@
                     </div>
                 </div>
             </div>
-            <div class="datepicker_demo_item">
+            <div class="datepicker_page_item">
                 <h2>다중 날짜 선택 · 기간 제한 없음</h2>
                 <div class="box_table_group box_datepicker">
                     <div class="cell">
@@ -56,7 +55,7 @@
                     </div>
                 </div>
             </div>
-            <div class="datepicker_demo_item" data-dp-scope>
+            <div class="datepicker_page_item" data-dp-scope>
                 <h2>날짜 선택 · 주말 제외, 공휴일 추가·제외</h2>
                 <div class="box_table_group box_datepicker">
                     <div class="cell">
@@ -69,7 +68,7 @@
                 <label for="w24dp_date_count">날짜 개수</label>
                 <input id="w24dp_date_count" type="text" class="input_txt" name="workdayCount">
             </div>
-            <div class="datepicker_demo_item">
+            <div class="datepicker_page_item">
                 <h2>월 선택</h2>
                 <div class="box_table_group box_datepicker">
                     <div class="cell">
@@ -80,7 +79,7 @@
                     </div>
                 </div>
             </div>
-            <div class="datepicker_demo_item">
+            <div class="datepicker_page_item">
                 <h2>기간 월 선택 · 시작월과 종료월</h2>
                 <div class="box_table_group box_datepicker flx-dir-col">
                     <div class="cell">
@@ -98,7 +97,7 @@
                     </div>
                 </div>
             </div>
-            <div class="datepicker_demo_item">
+            <div class="datepicker_page_item">
                 <h2>기간 날짜 선택 · 시작일과 종료일</h2>
                 <div class="box_table_group box_datepicker flx-dir-col">
                     <div class="cell">
@@ -116,8 +115,8 @@
                     </div>
                 </div>
             </div>
-            <div class="datepicker_demo_item">
-                <h2 lang="en">English example</h2>
+            <div class="datepicker_page_item">
+                <h2>영문 날짜 선택</h2>
                 <div class="box_table_group box_datepicker">
                     <div class="cell">
                         <span class="box_ipt">
