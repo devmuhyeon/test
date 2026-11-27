@@ -1750,15 +1750,34 @@ function swiperActiveIndex(swiper) {
         return null;
     }
 
-    function configuredYear($trigger, attribute, fallback) {
-        var value = $trigger.closest('[' + attribute + ']').attr(attribute);
-        return /^[1-9]\d{3}$/.test(value) ? Number(value) : fallback;
+    function configuredYear($trigger, attribute) {
+        var value = $trigger.attr(attribute);
+        return /^[1-9]\d{3}$/.test(value) ? Number(value) : null;
     }
 
     function yearBounds($trigger) {
-        var min = configuredYear($trigger, 'data-dp-min-year', 1900);
-        var max = configuredYear($trigger, 'data-dp-max-year', 2100);
-        return min <= max ? { min: min, max: max } : { min: 1900, max: 2100 };
+        var min = configuredYear($trigger, 'data-dp-min-year');
+        var max = configuredYear($trigger, 'data-dp-max-year');
+        return min && max && min > max ? { min: null, max: null } : { min: min, max: max };
+    }
+
+    function yearOptions(bounds, year) {
+        return {
+            min: bounds.min || Math.max(1000, year - 10),
+            max: bounds.max || Math.min(9999, year + 10)
+        };
+    }
+
+    function updateYearOptions(state, year) {
+        var range = yearOptions(state.years, year);
+        var key = range.min + ':' + range.max;
+        if (state.$year.data('yearRange') !== key) {
+            state.$year.empty().data('yearRange', key);
+            for (var optionYear = range.min; optionYear <= range.max; optionYear++) {
+                $('<option>').val(optionYear).text(optionYear + (state.lang === 'ko' ? '년' : '')).appendTo(state.$year);
+            }
+        }
+        state.$year.val(year);
     }
 
     function setup(element) {
@@ -1807,7 +1826,8 @@ function swiperActiveIndex(swiper) {
             $trigger: $trigger, $display: $display, $field: $field, $value: $value, mode: mode, lang: lang, words: languages[lang],
             monthOnly: mode === 'month', multi: multi,
             $countTarget: workday && countTarget ? $trigger.closest('form').find(countTarget).filter('input') : $(),
-            min: new Date(years.min, 0, 1), max: new Date(years.max, 11, 31),
+            years: years,
+            min: new Date(years.min || 1000, 0, 1), max: new Date(years.max || 9999, 11, 31),
             locked: multi ? parse($trigger.attr('data-dp-locked-month'), true) : null,
             disableWeekends: disableWeekends === undefined ? workday : disableWeekends === 'true',
             holidays: {},
@@ -1826,6 +1846,8 @@ function swiperActiveIndex(swiper) {
         });
 
         if (state.locked) {
+            var lockedYear = state.locked.getFullYear();
+            state.years = { min: lockedYear, max: lockedYear };
             state.min = state.locked;
             state.max = new Date(state.locked.getFullYear(), state.locked.getMonth() + 1, 0);
         }
@@ -1970,7 +1992,7 @@ function swiperActiveIndex(swiper) {
             describe({ words: words, lang: state.lang, monthOnly: true }, date);
         if (state.$heading.text() !== period) state.$heading.text(period);
 
-        state.$year.val(year);
+        updateYearOptions(state, year);
         state.$month.val(month);
         var step = state.monthOnly ? 12 : 1;
         state.$prev.prop('disabled', moveMonth(date, -step).getFullYear() < state.min.getFullYear() || !!state.locked);
@@ -2181,9 +2203,6 @@ function swiperActiveIndex(swiper) {
         state.$heading = $('<h2 class="w24dp-sr" aria-live="polite" aria-atomic="true">')
             .attr('id', id + '-heading').appendTo($main);
 
-        for (var year = state.min.getFullYear(); year <= state.max.getFullYear(); year++) {
-            $('<option>').val(year).text(year + (state.lang === 'ko' ? '년' : '')).appendTo(state.$year);
-        }
         $.each(words.months, function (month, label) {
             $('<option>').val(month).text(label).appendTo(state.$month);
         });
