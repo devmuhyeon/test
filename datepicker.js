@@ -352,13 +352,12 @@
             var item = state.monthOnly ? new Date(year, i, 1) : new Date(year, month, i - start + 1);
             var key = format(item, state.monthOnly);
             var inPeriod = state.monthOnly || item.getMonth() === month;
-            var nextPeriod = !inPeriod && item > date && state.fixedMonth === null;
-            var enabled = (inPeriod || nextPeriod) && canSelect(state, item);
+            var $cell = $('<td>').appendTo($row);
+            if (!inPeriod) continue;
+
+            var enabled = canSelect(state, item);
             var selected = enabled && $.inArray(key, state.draft) !== -1;
             var label = describe(state, item);
-            var $cell = $('<td>').appendTo($row);
-
-            if (!inPeriod && state.fixedMonth !== null) continue;
             var $item = $('<span class="w24dp_date">')
                 .text(state.monthOnly ? (state.lang === 'ko' ? words.months[i] : words.months[i].slice(0, 3)) : item.getDate())
                 .appendTo($cell);
@@ -369,7 +368,6 @@
                 continue;
             }
 
-            $cell.toggleClass('w24dp_other_month', nextPeriod);
             var focused = key === format(date, state.monthOnly);
             $cell.attr({ 'data-dp-date': key, tabindex: focused ? '0' : '-1', 'aria-selected': String(selected) });
             if (key === current) $cell.attr('aria-current', state.monthOnly ? 'true' : 'date');
@@ -377,8 +375,8 @@
                 var prev = format(new Date(item.getFullYear(), item.getMonth(), item.getDate() - 1), false);
                 var next = format(new Date(item.getFullYear(), item.getMonth(), item.getDate() + 1), false);
                 $cell.toggleClass('w24dp_joined_prev', i % columns !== 0 &&
-                    (i > start || nextPeriod) && $.inArray(prev, state.draft) !== -1);
-                $cell.toggleClass('w24dp_joined_next', i % columns !== columns - 1 &&
+                    item.getDate() > 1 && $.inArray(prev, state.draft) !== -1);
+                $cell.toggleClass('w24dp_joined_next', i % columns !== columns - 1 && item.getDate() < new Date(year, month + 1, 0).getDate() &&
                     $.inArray(next, state.draft) !== -1);
             }
         }
