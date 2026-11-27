@@ -2268,12 +2268,16 @@ function swiperActiveIndex(swiper) {
                 close(state, false);
                 return;
             }
+            if (active && active.multi) {
+                focusCalendar(active);
+                return;
+            }
             if (active) close(active, false, false);
             if (!state.$display.prop('disabled')) open(state);
         }).on('keydown.work24Datepicker', trigger, function (event) {
             if (active && active.$trigger[0] === this) handlePopupKey(active, event);
         }).on('click.work24Datepicker focusin.work24Datepicker', function (event) {
-            if (!active || event.work24DatepickerInside) return;
+            if (!active || active.multi || event.work24DatepickerInside) return;
             var target = event.target;
             if (target === active.$trigger[0] || $.contains(active.$trigger[0], target) ||
                 target === active.$dialog[0] || $.contains(active.$dialog[0], target)) return;
