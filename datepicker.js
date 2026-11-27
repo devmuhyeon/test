@@ -166,7 +166,7 @@
         var years = yearBounds($trigger);
         state = {
             $trigger: $trigger, $display: $display, $field: $field, $value: $value, mode: mode, lang: lang, words: languages[lang],
-            monthOnly: mode === 'month', multi: multi, range: mode === 'multi',
+            monthOnly: mode === 'month', multi: multi,
             $countTarget: workday && countTarget ? $countScope.find(countTarget).filter('input').first() : $(),
             years: years,
             min: new Date(years.min || 1000, 0, 1), max: new Date(years.max || 9999, 11, 31),
@@ -222,9 +222,7 @@
 
     function setValue(state, values) {
         var text = values[0] || '';
-        if (state.range && values.length > 1) {
-            text += ' ~ ' + values[values.length - 1];
-        } else if (values.length > 1) {
+        if (values.length > 1) {
             text += state.lang === 'ko' ? ' 외 ' + (values.length - 1) + '일' : ' + ' + (values.length - 1) + ' more';
         }
         state.displaySummary = text;
@@ -238,29 +236,10 @@
         state.$countTarget.val(values.length);
     }
 
-    function rangeDates(state, start, end) {
-        var bounds = [start, end].sort();
-        var date = parse(bounds[0], false);
-        var last = parse(bounds[1], false);
-        var dates = [];
-        for (; date <= last; date.setDate(date.getDate() + 1)) {
-            if (canSelect(state, date)) dates.push(format(date, false));
-        }
-        return dates;
-    }
-
     function syncTypedDates(state) {
         var text = state.$display.val().trim();
         if (state.$display.val() === state.displaySummary) text = state.summaryValues;
-        var endpoints = state.range && /^(\d{4}-\d{2}-\d{2})\s*~\s*(\d{4}-\d{2}-\d{2})$/.exec(text);
         var entries = text ? text.split(/\s*,\s*/) : [];
-        if (endpoints) {
-            var start = parse(endpoints[1], false);
-            var end = parse(endpoints[2], false);
-            if (start && end && canSelect(state, start) && canSelect(state, end)) {
-                entries = rangeDates(state, endpoints[1], endpoints[2]);
-            }
-        }
         var values = $.grep(entries, function (entry) {
             var date = parse(entry, false);
             return date && canSelect(state, date);
@@ -397,20 +376,6 @@
         if (!state.multi) return;
         state.$count.text(state.draft.length + (state.lang === 'ko' ? '일' : ''));
         state.$list.empty();
-        if (state.range) {
-            state.$apply.prop('disabled', !!state.rangeStart);
-            if (state.rangeStart) {
-                state.$rangeStatus.text(state.lang === 'ko' ? '종료일을 선택하세요.' : 'Choose an end date.');
-            } else {
-                state.$rangeStatus.text('');
-            }
-            if (state.draft.length) {
-                var label = state.draft[0];
-                if (state.draft.length > 1) label += ' ~ ' + state.draft[state.draft.length - 1];
-                $('<li>').text(label).appendTo(state.$list);
-            }
-            return;
-        }
         $.each(state.draft, function (_, value) {
             var label = state.lang === 'ko' ? value + ' ' + state.words.remove : state.words.remove + ' ' + value;
             $('<li>').append($('<span>').text(value), button('×', 'remove', label).attr('data-dp-remove', value))
@@ -440,20 +405,10 @@
             close(state, true);
             return;
         }
-        if (state.range) {
-            if (state.rangeStart) {
-                state.draft = rangeDates(state, state.rangeStart, key);
-                state.rangeStart = null;
-            } else {
-                state.rangeStart = key;
-                state.draft = [key];
-            }
-        } else {
-            var index = $.inArray(key, state.draft);
-            if (index === -1) state.draft.push(key);
-            else state.draft.splice(index, 1);
-            state.draft.sort();
-        }
+        var index = $.inArray(key, state.draft);
+        if (index === -1) state.draft.push(key);
+        else state.draft.splice(index, 1);
+        state.draft.sort();
         render(state, true);
         renderSelection(state);
     }
@@ -540,7 +495,6 @@
             } else if (action === 'remove' || action === 'reset') {
                 var index = state.$list.find('button').index(this);
                 var value = $(this).attr('data-dp-remove');
-                if (action === 'reset') state.rangeStart = null;
                 state.draft = action === 'reset' ? [] : $.grep(state.draft, function (item) { return item !== value; });
                 render(state, false);
                 renderSelection(state);
@@ -564,7 +518,6 @@
         if (state.multi) syncTypedDates(state);
         var current = state.$value.val();
         var selected = parse(current, state.monthOnly);
-        state.rangeStart = null;
         state.draft = state.multi ? (current ? current.split(',') : []) :
             (selected && canSelect(state, selected) ? [current] : []);
         state.cursor = clamp(state, parse(state.draft[0], state.monthOnly) || state.today);
@@ -615,8 +568,7 @@
             state.$list = $('<ul class="w24dp_list">').attr('aria-label', words.count).appendTo($side);
             var $actions = $('<div class="w24dp_footer">').appendTo($side);
             state.$reset = button(words.reset, 'reset').prepend($('<span aria-hidden="true">').text('⟲ ')).appendTo($actions);
-            state.$apply = button(words.apply, 'apply').appendTo($actions);
-            if (state.range) state.$rangeStatus = $('<span class="w24dp_sr" aria-live="polite">').appendTo($side);
+            button(words.apply, 'apply').appendTo($actions);
         }
 
         active = state;
