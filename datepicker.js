@@ -88,24 +88,29 @@
         var $name = $trigger.children('.blind').first();
         var label = ($name.length ? $name : $trigger).text().replace(/\s+/g, ' ').trim();
         var $display = $trigger.prev('input[type="text"], input:not([type])');
-        if (!$display.length) $display = $('<input type="text">').insertBefore($trigger);
+        var generatedInput = !$display.length;
+        if (generatedInput) $display = $('<input type="text" readonly>').insertBefore($trigger);
+        label = label || $trigger.attr('title');
+        if ($display.attr('title') && label) label = $display.attr('title') + ' ' + label;
 
-        var $field = $trigger.parent('.w24dp-field');
+        var $field = $trigger.parent('.box_ipt, .w24dp-field');
         if (!$field.length) {
             $display.add($trigger).wrapAll('<div class="w24dp-field">');
             $field = $trigger.parent();
         }
         $field.toggleClass('w24dp-field-wide', multi);
-        var $value = $('<input type="hidden">');
+        var $value = multi ? $('<input type="hidden">') : $display;
         var countTarget = $trigger.attr('data-dp-count-target');
         var disableWeekends = $trigger.attr('data-dp-disable-weekends');
         var displayName = $display.attr('name');
         var name = $trigger.attr('data-dp-name') || displayName;
         var initial = $trigger.attr('data-dp-value');
         if (initial === undefined) initial = $display.val();
-        if (name) {
+        if (name && multi) {
             $display.removeAttr('name');
             $value.attr('name', name).insertAfter($trigger);
+        } else if (name && !displayName) {
+            $display.attr('name', name);
         }
 
         state = {
@@ -138,13 +143,16 @@
         if (!$name.length) $name = $('<span class="blind">').text(state.label);
         $name.detach();
         $trigger.empty().addClass('btn_calendar w24dp-trigger').append($name);
-        $display.addClass('w24dp-display').prop('readOnly', true)
-            .attr('placeholder', mode === 'month' ? 'YYYY-MM' : 'YYYY-MM-DD');
+        if (!$field.is('.box_ipt')) $display.addClass('w24dp-display');
+        if (multi) $display.prop('readOnly', true);
+        if (!$display.attr('placeholder')) {
+            $display.attr('placeholder', mode === 'month' ? 'YYYY-MM' : 'YYYY-MM-DD');
+        }
         var inputId = $display.attr('id');
         var hasLabel = $display.closest('label').length || (inputId && $('label').filter(function () {
             return this.htmlFor === inputId;
         }).length);
-        if (!hasLabel && !$display.attr('aria-label') && !$display.attr('aria-labelledby')) {
+        if (!hasLabel && !$display.attr('aria-label') && !$display.attr('aria-labelledby') && !$display.attr('title')) {
             $display.attr('aria-label', state.label);
         }
         var initialValues = initial.split(',');
@@ -152,7 +160,16 @@
             var date = parse(value, state.monthOnly);
             return date && canSelect(state, date) && $.inArray(value, initialValues) === index;
         }).sort();
-        setValue(state, state.multi ? values : values.slice(0, 1));
+        if (state.multi || values.length || generatedInput || $trigger.is('[data-dp-value]')) {
+            setValue(state, state.multi ? values : values.slice(0, 1));
+        } else {
+            updateTriggerName(state);
+        }
+        if (!state.multi) {
+            $display.on('input.work24Datepicker change.work24Datepicker', function () {
+                updateTriggerName(state);
+            });
+        }
         return state;
     }
 
@@ -162,9 +179,14 @@
             text += state.lang === 'ko' ? ' 외 ' + (values.length - 1) + '일' : ' + ' + (values.length - 1) + ' more';
         }
         state.$display.val(text);
-        state.$trigger.attr('aria-label', text ? state.label + ' ' + text : state.label);
-        state.$value.val(values.join(','));
+        updateTriggerName(state);
+        if (state.multi) state.$value.val(values.join(','));
         state.$countTarget.val(values.length);
+    }
+
+    function updateTriggerName(state) {
+        var text = state.$display.val();
+        state.$trigger.attr('aria-label', text ? state.label + ' ' + text : state.label);
     }
 
     function describe(state, date) {
@@ -299,7 +321,7 @@
         state.$trigger.attr('aria-expanded', 'false').removeAttr('aria-controls').trigger('focus');
         if (commit && previous !== state.$value.val()) {
             state.$value.trigger('change');
-            state.$display.trigger('change');
+            if (state.multi) state.$display.trigger('change');
             state.$countTarget.trigger('change');
             state.$trigger.trigger('work24datepicker:change', [state.multi ? state.draft.slice() : state.$value.val()]);
         }
@@ -411,7 +433,10 @@
         var words = state.words;
         var now = new Date();
         state.today = new Date(now.getFullYear(), now.getMonth(), state.monthOnly ? 1 : now.getDate());
-        state.draft = state.$value.val() ? state.$value.val().split(',') : [];
+        var current = state.$value.val();
+        var selected = parse(current, state.monthOnly);
+        state.draft = state.multi ? (current ? current.split(',') : []) :
+            (selected && canSelect(state, selected) ? [current] : []);
         state.cursor = clamp(state, parse(state.draft[0], state.monthOnly) || state.today);
 
         var id = 'w24dp-dialog';

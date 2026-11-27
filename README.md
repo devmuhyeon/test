@@ -8,22 +8,25 @@
 
 1. `datepicker.css` 내용을 첫 번째 공통 CSS의 아이콘 정의 앞에 삽입합니다.
 2. `datepicker.js` 내용을 공통 JS 최하단에 추가합니다. 기존 jQuery 3.6.1 로딩을 유지합니다.
-3. JSP에서 표시용 텍스트 입력란 바로 뒤에 `btn_calendar` 버튼을 배치합니다. 달력 유형은 버튼의 `w24-datepicker`로 지정합니다. jQuery UI 달력과 함께 사용하는 화면에서는 각각의 마크업을 사용합니다.
+3. JSP에서 기존 `.box_table_group.box_datepicker > .cell > .box_ipt` 안에 `.input_txt`와 `.btn_calendar`를 배치합니다. 달력 유형은 버튼의 `w24-datepicker`로 지정합니다. jQuery UI 달력과 함께 사용하는 화면에서는 각각의 마크업을 사용합니다.
 
 ```html
-<label for="visit-date">방문일</label>
-<div class="w24dp-field">
-    <input type="text" id="visit-date" readonly>
-    <button type="button" class="btn_calendar" w24-datepicker="single" data-dp-name="visitDate">
-        <span class="blind">달력선택</span>
-    </button>
+<div class="box_table_group box_datepicker">
+    <div class="cell">
+        <span class="box_ipt">
+            <input type="text" class="input_txt" id="testDtList_0" name="testDtList" title="응시일" placeholder="YYYY-MM-DD" autocomplete="off" inputmode="numeric">
+            <button type="button" class="btn_calendar" w24-datepicker="single"><span class="blind">달력선택</span></button>
+        </span>
+    </div>
 </div>
 ```
+
+기존 입력란의 `id`, 직접 입력과 연결된 이벤트를 유지합니다. `single`·`month`는 기존 입력란의 `name`으로 값을 전송합니다. 기간 월 선택은 시작·종료 입력란에 각각 `w24-datepicker="month"` 버튼을 연결합니다. 기존 jQuery UI에 바인딩된 필드를 전환할 경우, 해당 필드는 기존 초기화 대상에서 빼고 새 버튼에만 `w24-datepicker`를 적용합니다.
 
 | 속성 | 값 |
 | --- | --- |
 | `w24-datepicker` | `single` 단일 날짜, `multiple` 다중 날짜, `month` 월, `workday` 근무일 |
-| `data-dp-name` | 폼 전송용 hidden input 이름. 생략하면 표시용 입력란의 기존 `name`을 사용합니다. `request.getParameter("visitDate")`로 읽을 수 있습니다. |
+| `data-dp-name` | 전송 필드 이름. `single`·`month`는 기존 입력의 `name`이 없을 때 이 값을 사용합니다. `multiple`·`workday`는 이 이름으로 hidden input을 만들며, 생략하면 기존 입력의 `name`을 사용합니다. `request.getParameter("visitDate")`로 읽을 수 있습니다. |
 | `data-dp-value` | 서버 초깃값. `2026-12-05`, `2026-12`, 또는 `2026-12-05,2026-12-12` |
 | `data-dp-locked-month` | 다중 선택을 지정 월에 고정할 때 `2026-12` |
 | `data-dp-lang` | 기본 `ko`, 영문 `en` |

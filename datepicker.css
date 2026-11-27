@@ -28,6 +28,10 @@
 }
 .w24dp-field-wide input.w24dp-display { width: 200px; }
 .w24dp-field input.w24dp-display::placeholder { color: #666; }
+.box_ipt > button.btn_calendar.w24dp-trigger,
+.w24dp-field button.btn_calendar.w24dp-trigger {
+    background: center / 20px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none' stroke='%23333' stroke-width='1.4'%3E%3Crect x='1.5' y='3.5' width='17' height='15' rx='2.5'/%3E%3Cpath d='M5.5 1v5m9-5v5M2 8h16m-12 3h1m2.5 0h1m2.5 0h1m-8 3h1m2.5 0h1m2.5 0h1'/%3E%3C/svg%3E");
+}
 .w24dp-field button.btn_calendar.w24dp-trigger {
     position: absolute;
     top: 50%;
@@ -40,7 +44,6 @@
     border: 0;
     text-indent: 0;
     cursor: pointer;
-    background: center / 20px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none' stroke='%23333' stroke-width='1.4'%3E%3Crect x='1.5' y='3.5' width='17' height='15' rx='2.5'/%3E%3Cpath d='M5.5 1v5m9-5v5M2 8h16m-12 3h1m2.5 0h1m2.5 0h1m-8 3h1m2.5 0h1m2.5 0h1'/%3E%3C/svg%3E");
 }
 .w24dp-field button.btn_calendar.w24dp-trigger:disabled { cursor: default; opacity: .45; }
 .w24dp-layer { position: fixed; z-index: 10090; top: 0; right: 0; bottom: 0; left: 0; }
@@ -184,6 +187,7 @@
 }
 .w24dp-list li { display: flex; align-items: center; justify-content: space-between; min-height: 36px; }
 .w24dp-dialog .w24dp-list button { border-color: transparent; background: transparent; color: #606060; }
+.box_ipt > button.btn_calendar.w24dp-trigger:focus,
 .w24dp-field input.w24dp-display:focus,
 .w24dp-field button.btn_calendar.w24dp-trigger:focus { outline: 2px solid #1d308c; outline-offset: 1px; }
 .w24dp-dialog button:focus,
@@ -203,6 +207,7 @@ button.w24dp-trigger > .blind,
     border: 0;
 }
 @media (forced-colors: active) {
+    .box_ipt > button.btn_calendar.w24dp-trigger,
     .w24dp-field button.btn_calendar.w24dp-trigger { forced-color-adjust: none; background-color: #fff; }
     .w24dp-field button.btn_calendar.w24dp-trigger:focus { outline-color: Highlight; }
     .w24dp-dialog select { appearance: auto; background: Canvas; padding-right: 3px; }
