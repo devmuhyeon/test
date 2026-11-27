@@ -8,38 +8,38 @@
 
 1. `datepicker.css` 내용을 첫 번째 공통 CSS의 아이콘 정의 앞에 삽입합니다.
 2. `datepicker.js` 내용을 공통 JS 최하단에 추가합니다. 기존 jQuery 3.6.1 로딩을 유지합니다.
-3. JSP에 아래 버튼을 한 줄 넣습니다. jQuery UI 달력과 함께 사용하는 화면에서는 각각의 마크업을 사용합니다.
+3. JSP에서 표시용 텍스트 입력란 바로 뒤에 `btn_calendar` 버튼을 배치합니다. 달력 유형은 버튼의 `w24-datepicker`로 지정합니다. jQuery UI 달력과 함께 사용하는 화면에서는 각각의 마크업을 사용합니다.
 
 ```html
-<!-- A타입: 단일 날짜 -->
-<button type="button" class="date_picker_btn" w24-datepicker="single"></button>
-
-<!-- B타입: 다중 날짜 -->
-<button type="button" class="date_picker_btn" w24-datepicker="multiple"></button>
-
-<!-- C타입: 월 선택 -->
-<button type="button" class="date_picker_btn" w24-datepicker="month"></button>
-
-<!-- D타입: 근무일 선택 -->
-<button type="button" class="date_picker_btn" w24-datepicker="workday"></button>
+<label for="visit-date">방문일</label>
+<div class="w24dp-field">
+    <input type="text" id="visit-date" readonly>
+    <button type="button" class="btn_calendar" w24-datepicker="single" data-dp-name="visitDate">
+        <span class="blind">달력선택</span>
+    </button>
+</div>
 ```
 
 | 속성 | 값 |
 | --- | --- |
 | `w24-datepicker` | `single` 단일 날짜, `multiple` 다중 날짜, `month` 월, `workday` 근무일 |
-| `data-dp-name` | 폼 전송용 hidden input 이름. `request.getParameter("visitDate")`로 읽을 수 있습니다. |
+| `data-dp-name` | 폼 전송용 hidden input 이름. 생략하면 표시용 입력란의 기존 `name`을 사용합니다. `request.getParameter("visitDate")`로 읽을 수 있습니다. |
 | `data-dp-value` | 서버 초깃값. `2026-12-05`, `2026-12`, 또는 `2026-12-05,2026-12-12` |
 | `data-dp-locked-month` | 다중 선택을 지정 월에 고정할 때 `2026-12` |
 | `data-dp-lang` | 기본 `ko`, 영문 `en` |
 
 선택값은 각각 `YYYY-MM-DD`, `YYYY-MM`, 날짜 목록을 쉼표로 연결한 문자열입니다. 다중 선택은 **적용**에서 저장하며 빈 목록도 적용할 수 있습니다. 저장값이 바뀌면 hidden input의 `change`와 버튼의 `work24datepicker:change` 이벤트가 발생합니다. 버튼 이벤트의 두 번째 인수는 단일 날짜·월 모드에서 문자열이고 다중 모드에서 날짜 배열입니다. 기본 연도 범위는 1900~2100입니다.
 
-버튼 안의 `span.blind`에 `방문일`처럼 필드명을 넣으면 선택값과 함께 버튼의 `aria-label`을 자동 생성합니다. 버튼이 비어 있으면 유형별 기본 이름을 지정하고 `span.blind`를 생성합니다. 기존 `button.btn_calendar`는 현재 마크업과 초기화 방식을 그대로 사용합니다.
+버튼 안의 `span.blind`에 `방문일`처럼 필드명을 넣으면 선택값과 함께 버튼의 `aria-label`을 자동 생성합니다. 버튼이 비어 있으면 유형별 기본 이름을 지정하고 `span.blind`를 생성합니다. `w24-datepicker`가 없는 기존 버튼에는 이 컴포넌트가 연결되지 않습니다.
 
 ## 주말과 공휴일 설정
 
 ```html
-<button type="button" class="date_picker_btn" w24-datepicker="workday" data-dp-name="workDates" data-dp-count-target="#workday-count" data-dp-holidays="2026-12-25" data-dp-holidays-add="2026-12-24,2026-12-31" data-dp-holidays-exclude="2026-12-24"><span class="blind">근무일 선택</span></button>
+<label for="work-dates">근무일</label>
+<div class="w24dp-field">
+    <input type="text" id="work-dates" readonly>
+    <button type="button" class="btn_calendar" w24-datepicker="workday" data-dp-name="workDates" data-dp-count-target="#workday-count" data-dp-holidays="2026-12-25" data-dp-holidays-add="2026-12-24,2026-12-31" data-dp-holidays-exclude="2026-12-24"><span class="blind">달력선택</span></button>
+</div>
 <label for="workday-count">선택한 근무일 수</label>
 <input id="workday-count" name="workdayCount" type="text" readonly>
 ```

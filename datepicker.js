@@ -87,14 +87,29 @@
         var lang = $trigger.attr('data-dp-lang') === 'en' ? 'en' : 'ko';
         var $name = $trigger.children('.blind').first();
         var label = ($name.length ? $name : $trigger).text().replace(/\s+/g, ' ').trim();
+        var $display = $trigger.prev('input[type="text"], input:not([type])');
+        if (!$display.length) $display = $('<input type="text">').insertBefore($trigger);
+
+        var $field = $trigger.parent('.w24dp-field');
+        if (!$field.length) {
+            $display.add($trigger).wrapAll('<div class="w24dp-field">');
+            $field = $trigger.parent();
+        }
+        $field.toggleClass('w24dp-field-wide', multi);
         var $value = $('<input type="hidden">');
         var countTarget = $trigger.attr('data-dp-count-target');
         var disableWeekends = $trigger.attr('data-dp-disable-weekends');
-        var name = $trigger.attr('data-dp-name');
-        if (name) $value.attr('name', name).insertAfter($trigger);
+        var displayName = $display.attr('name');
+        var name = $trigger.attr('data-dp-name') || displayName;
+        var initial = $trigger.attr('data-dp-value');
+        if (initial === undefined) initial = $display.val();
+        if (name) {
+            $display.removeAttr('name');
+            $value.attr('name', name).insertAfter($trigger);
+        }
 
         state = {
-            $trigger: $trigger, $value: $value, mode: mode, lang: lang, words: languages[lang],
+            $trigger: $trigger, $display: $display, $field: $field, $value: $value, mode: mode, lang: lang, words: languages[lang],
             monthOnly: mode === 'month', multi: multi,
             $countTarget: workday && countTarget ? $trigger.closest('form').find(countTarget).filter('input') : $(),
             min: new Date(1900, 0, 1), max: new Date(2100, 11, 31),
@@ -122,10 +137,16 @@
 
         if (!$name.length) $name = $('<span class="blind">').text(state.label);
         $name.detach();
-        $trigger.empty().addClass('date_picker_btn w24dp-trigger').append($name);
-        state.$text = $('<span>').appendTo($trigger);
-        state.$icon = $('<span class="w24dp-icon" aria-hidden="true">').appendTo($trigger);
-        var initial = $trigger.attr('data-dp-value') || '';
+        $trigger.empty().addClass('btn_calendar w24dp-trigger').append($name);
+        $display.addClass('w24dp-display').prop('readOnly', true)
+            .attr('placeholder', mode === 'month' ? 'YYYY-MM' : 'YYYY-MM-DD');
+        var inputId = $display.attr('id');
+        var hasLabel = $display.closest('label').length || (inputId && $('label').filter(function () {
+            return this.htmlFor === inputId;
+        }).length);
+        if (!hasLabel && !$display.attr('aria-label') && !$display.attr('aria-labelledby')) {
+            $display.attr('aria-label', state.label);
+        }
         var initialValues = initial.split(',');
         var values = $.grep(initialValues, function (value, index) {
             var date = parse(value, state.monthOnly);
@@ -136,12 +157,12 @@
     }
 
     function setValue(state, values) {
-        var text = values[0] || (state.monthOnly ? 'YYYY-MM' : 'YYYY-MM-DD');
+        var text = values[0] || '';
         if (values.length > 1) {
             text += state.lang === 'ko' ? ' 외 ' + (values.length - 1) + '일' : ' + ' + (values.length - 1) + ' more';
         }
-        state.$text.text(text);
-        state.$trigger.attr('aria-label', state.label + ' ' + text);
+        state.$display.val(text);
+        state.$trigger.attr('aria-label', text ? state.label + ' ' + text : state.label);
         state.$value.val(values.join(','));
         state.$countTarget.val(values.length);
     }
@@ -158,7 +179,7 @@
     }
 
     function position(state) {
-        var rect = state.$trigger[0].getBoundingClientRect();
+        var rect = state.$field[0].getBoundingClientRect();
         var width = state.$dialog.outerWidth();
         var height = state.$dialog.outerHeight();
         var left = Math.max(8, Math.min(rect.left, document.documentElement.clientWidth - width - 8));
@@ -278,6 +299,7 @@
         state.$trigger.attr('aria-expanded', 'false').removeAttr('aria-controls').trigger('focus');
         if (commit && previous !== state.$value.val()) {
             state.$value.trigger('change');
+            state.$display.trigger('change');
             state.$countTarget.trigger('change');
             state.$trigger.trigger('work24datepicker:change', [state.multi ? state.draft.slice() : state.$value.val()]);
         }
@@ -462,7 +484,10 @@
     $(function () {
         $(trigger).each(function () { setup(this); });
         $(document).on('click.work24Datepicker', trigger, function () {
-            if (!active) open(setup(this));
+            if (!active) {
+                var state = setup(this);
+                if (!state.$display.prop('disabled')) open(state);
+            }
         }).on('focusin.work24Datepicker', function (event) {
             if (active && !$.contains(active.$dialog[0], event.target)) {
                 focusCalendar(active);

@@ -2258,7 +2258,6 @@ strong {
 }
 
 /* 고용24 PC 공통 날짜 선택 */
-button.w24dp-trigger,
 .w24dp-dialog button,
 .w24dp-dialog select {
     box-sizing: border-box;
@@ -2266,31 +2265,43 @@ button.w24dp-trigger,
     font: inherit;
     color: inherit;
 }
-button.w24dp-trigger {
-    display: inline-flex;
-    align-items: center;
-    justify-content: space-between;
-    min-width: 160px;
-    min-height: 40px;
-    padding: 8px 14px;
+.w24dp-field {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    vertical-align: middle;
+}
+.w24dp-field input.w24dp-display {
+    display: block;
+    box-sizing: border-box;
+    width: 160px;
+    max-width: 100%;
+    height: 40px;
+    padding: 8px 42px 8px 15px;
     border: 1px solid #767676;
     border-radius: 4px;
     background: #fff;
     color: #333;
+    font: inherit;
     font-size: 14px;
-    cursor: pointer;
 }
-button.w24dp-trigger[w24-datepicker="multiple"],
-button.w24dp-trigger[w24-datepicker="workday"] { min-width: 200px; }
-button.w24dp-trigger:disabled { cursor: default; color: #767676; }
-.w24dp-icon {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    margin-left: 10px;
-    vertical-align: middle;
+.w24dp-field-wide input.w24dp-display { width: 200px; }
+.w24dp-field input.w24dp-display::placeholder { color: #666; }
+.w24dp-field button.btn_calendar.w24dp-trigger {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    left: auto;
+    width: 32px;
+    height: 32px;
+    margin: -16px 0 0;
+    padding: 0;
+    border: 0;
+    text-indent: 0;
+    cursor: pointer;
     background: center / 20px no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none' stroke='%23333' stroke-width='1.4'%3E%3Crect x='1.5' y='3.5' width='17' height='15' rx='2.5'/%3E%3Cpath d='M5.5 1v5m9-5v5M2 8h16m-12 3h1m2.5 0h1m2.5 0h1m-8 3h1m2.5 0h1m2.5 0h1'/%3E%3C/svg%3E");
 }
+.w24dp-field button.btn_calendar.w24dp-trigger:disabled { cursor: default; opacity: .45; }
 .w24dp-layer { position: fixed; z-index: 10090; top: 0; right: 0; bottom: 0; left: 0; }
 .w24dp-dialog {
     position: fixed;
@@ -2432,7 +2443,8 @@ button.w24dp-trigger:disabled { cursor: default; color: #767676; }
 }
 .w24dp-list li { display: flex; align-items: center; justify-content: space-between; min-height: 36px; }
 .w24dp-dialog .w24dp-list button { border-color: transparent; background: transparent; color: #606060; }
-button.w24dp-trigger:focus,
+.w24dp-field input.w24dp-display:focus,
+.w24dp-field button.btn_calendar.w24dp-trigger:focus { outline: 2px solid #1d308c; outline-offset: 1px; }
 .w24dp-dialog button:focus,
 .w24dp-dialog select:focus,
 .w24dp-dialog [data-dp-date]:focus { position: relative; z-index: 1; outline: 2px solid #1d308c; outline-offset: 1px; }
@@ -2450,6 +2462,8 @@ button.w24dp-trigger > .blind,
     border: 0;
 }
 @media (forced-colors: active) {
+    .w24dp-field button.btn_calendar.w24dp-trigger { forced-color-adjust: none; background-color: #fff; }
+    .w24dp-field button.btn_calendar.w24dp-trigger:focus { outline-color: Highlight; }
     .w24dp-dialog select { appearance: auto; background: Canvas; padding-right: 3px; }
     .w24dp-grid [aria-selected="true"] .w24dp-date { border: 2px solid Highlight; }
     .w24dp-grid [aria-current] .w24dp-date { text-decoration: underline; }
