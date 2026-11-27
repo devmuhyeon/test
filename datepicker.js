@@ -2,6 +2,9 @@
 ;(function ($) {
     'use strict';
 
+    // YYYY-MM-DD 형식의 공통 공휴일을 이 목록에 등록합니다.
+    var commonHolidays = [];
+
     var trigger = 'button[w24-datepicker], button[data-work24-datepicker]';
     var active;
     var languages = {
@@ -51,6 +54,21 @@
     function dateList($trigger, attribute) {
         var raw = $trigger.attr(attribute) || '';
         return $.grep(raw.split(/[,\s]+/), function (value) { return !!parse(value, false); });
+    }
+
+    function buildHolidays($trigger) {
+        var holidays = {};
+        var dates = commonHolidays.concat(
+            dateList($trigger, 'data-dp-holidays'),
+            dateList($trigger, 'data-dp-holidays-add')
+        );
+        $.each(dates, function (_, value) {
+            if (parse(value, false)) holidays[value] = true;
+        });
+        $.each(dateList($trigger, 'data-dp-holidays-exclude'), function (_, value) {
+            delete holidays[value];
+        });
+        return holidays;
     }
 
     function canSelect(state, date) {
@@ -152,20 +170,9 @@
             min: new Date(years.min || 1000, 0, 1), max: new Date(years.max || 9999, 11, 31),
             locked: multi ? parse($trigger.attr('data-dp-locked-month'), true) : null,
             disableWeekends: disableWeekends === undefined ? workday : disableWeekends === 'true',
-            holidays: {},
+            holidays: buildHolidays($trigger),
             label: label || languages[lang][mode]
         };
-
-        var holidays = dateList($trigger, 'data-dp-holidays');
-        $trigger.parents('[data-dp-holidays-add]').addBack().each(function () {
-            holidays = holidays.concat(dateList($(this), 'data-dp-holidays-add'));
-        });
-        $.each(holidays, function (_, value) {
-            state.holidays[value] = true;
-        });
-        $.each(dateList($trigger, 'data-dp-holidays-exclude'), function (_, value) {
-            delete state.holidays[value];
-        });
 
         if (state.locked) {
             var lockedYear = state.locked.getFullYear();
